@@ -1,0 +1,10 @@
+Tiles were taken from:
+http://www.purezc.com/index.php?page=tiles&id=457
+
+Sprites were taken from:
+http://legend-of-zelda411.tripod.com/sprites_gifs.html
+
+Requires the OpenGL, GLU, GLUT, and PNG libraries.
+To compile, run `make'. To play, run `./a.out'.
+
+Press F12 to save a screenshot to the png directory.
