@@ -23,63 +23,6 @@ extern "C" {
 #include "spring_camera.hh"
 #include "vector.hh"
 
-GLuint
-texture_load_png(const char *fn)
-{
-	FILE *fp = fopen(fn, "rb");
-	if(!fp)
-		exit(1);
-
-	png_structp png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING,
-		NULL, NULL, NULL);
-	if(!png_ptr)
-		exit(1);
-
-	png_infop info_ptr = png_create_info_struct(png_ptr);
-	if(!info_ptr)
-		exit(1);
-
-	png_init_io(png_ptr, fp);
-
-	uint8_t *image = new uint8_t[4 * 16 * 16];
-	png_bytep row_pointers[16];
-
-	for(int i = 0; i < 16; i++)
-		row_pointers[i] = &image[4 * 16 * i];
-
-	png_set_rows(png_ptr, info_ptr, row_pointers);
-	png_read_png(png_ptr, info_ptr, PNG_TRANSFORM_IDENTITY, NULL);
-
-	GLuint texture;
-
-	glGenTextures(1, &texture);
-	glBindTexture(GL_TEXTURE_2D, texture);
-
-	if(png_ptr->color_type == PNG_COLOR_TYPE_RGB) {
-		fprintf(stderr, "error: %s: rgb not implemented\n", fn);
-		gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGBA, 16, 16,
-			GL_RGBA, GL_UNSIGNED_INT_8_8_8_8_REV, image);
-	} else if(png_ptr->color_type == PNG_COLOR_TYPE_RGBA) {
-		gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGBA, 16, 16,
-			GL_RGBA, GL_UNSIGNED_INT_8_8_8_8_REV, image);
-	} else {
-		fprintf(stderr, "error: %s: unhandled png type\n", fn);
-		exit(1);
-	}
-
-	glBindTexture(GL_TEXTURE_2D, texture);
-	glTexParameteri(GL_TEXTURE_2D,
-		GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D,
-		GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-	png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
-
-	fclose(fp);
-
-	return texture;
-}
-
 static character protagonist;
 static background background;
 
@@ -179,12 +122,11 @@ display()
 	static unsigned int frame = 0;
 	static int time_prev = 0;
 
-	static char fps[10] = "0";
+	static char fps[16] = "FPS: 0";
 
 	int time = glutGet(GLUT_ELAPSED_TIME);
-	int delta_time = time > time_prev
-		? time - time_prev : time_prev - time;
-	if(delta_time > 1000) {
+	int delta_time = time - time_prev;
+	if(delta_time >= 1000) {
 		snprintf(fps, sizeof(fps),
 			"FPS: %d", 1000 * frame / delta_time);
 

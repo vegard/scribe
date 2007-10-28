@@ -1,4 +1,5 @@
 #include "background.hh"
+#include "texture.hh"
 
 extern "C" {
 #include "GL/gl.h"
@@ -17,16 +18,14 @@ static GLuint desert_wall_bottom;
 static GLuint desert_wall_middle;
 static GLuint desert_wall_top;
 
-GLuint texture_load_png(const char *fn);
-
 void
 background::load_textures()
 {
-	desert[0] = texture_load_png("tiles/desert-1.png");
-	desert[1] = texture_load_png("tiles/desert-2.png");
-	desert_wall_bottom = texture_load_png("tiles/desert-wall-bottom.png");
-	desert_wall_middle = texture_load_png("tiles/desert-wall-middle.png");
-	desert_wall_top = texture_load_png("tiles/desert-wall-top.png");
+	desert[0] = texture::get_png("tiles/desert-1.png");
+	desert[1] = texture::get_png("tiles/desert-2.png");
+	desert_wall_bottom = texture::get_png("tiles/desert-wall-bottom.png");
+	desert_wall_middle = texture::get_png("tiles/desert-wall-middle.png");
+	desert_wall_top = texture::get_png("tiles/desert-wall-top.png");
 }
 
 void

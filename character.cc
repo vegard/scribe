@@ -1,4 +1,5 @@
 #include "character.hh"
+#include "texture.hh"
 
 extern "C" {
 #include <GL/gl.h>
@@ -13,19 +14,17 @@ character::~character()
 {
 }
 
-GLuint texture_load_png(const char *fn);
-
 void
 character::load_textures()
 {
-	textures[0] = texture_load_png("sprites/link-down-1.png");
-	textures[1] = texture_load_png("sprites/link-down-2.png");
-	textures[2] = texture_load_png("sprites/link-up-1.png");
-	textures[3] = texture_load_png("sprites/link-up-2.png");
-	textures[4] = texture_load_png("sprites/link-left-1.png");
-	textures[5] = texture_load_png("sprites/link-left-2.png");
-	textures[6] = texture_load_png("sprites/link-right-1.png");
-	textures[7] = texture_load_png("sprites/link-right-2.png");
+	textures[0] = texture::get_png("sprites/link-down-1.png");
+	textures[1] = texture::get_png("sprites/link-down-2.png");
+	textures[2] = texture::get_png("sprites/link-up-1.png");
+	textures[3] = texture::get_png("sprites/link-up-2.png");
+	textures[4] = texture::get_png("sprites/link-left-1.png");
+	textures[5] = texture::get_png("sprites/link-left-2.png");
+	textures[6] = texture::get_png("sprites/link-right-1.png");
+	textures[7] = texture::get_png("sprites/link-right-2.png");
 }
 
 void
