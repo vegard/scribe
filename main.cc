@@ -17,7 +17,14 @@ extern "C" {
 #include <GL/glut.h>
 }
 
-static GLuint
+#include "camera.hh"
+#include "character.hh"
+#include "object.hh"
+#include "scene.hh"
+#include "spring_camera.hh"
+#include "vector.hh"
+
+GLuint
 texture_load_png(const char *fn)
 {
 	FILE *fp = fopen(fn, "rb");
@@ -74,31 +81,19 @@ texture_load_png(const char *fn)
 	return texture;
 }
 
-GLuint link_up[2];
-GLuint link_down[2];
-GLuint link_left[2];
-GLuint link_right[2];
-GLuint desert[2];
-GLuint desert_wall_bottom;
-GLuint desert_wall_middle;
-GLuint desert_wall_top;
+static character protagonist;
+static background background;
+
+static spring_camera c(protagonist, vector(0, 2, 8), 1e-5, 1e-2);
+static scene s(c, background);
 
 static void
 init()
 {
-	link_up[0] = texture_load_png("sprites/link-up-1.png");
-	link_up[1] = texture_load_png("sprites/link-up-2.png");
-	link_down[0] = texture_load_png("sprites/link-down-1.png");
-	link_down[1] = texture_load_png("sprites/link-down-2.png");
-	link_left[0] = texture_load_png("sprites/link-left-1.png");
-	link_left[1] = texture_load_png("sprites/link-left-2.png");
-	link_right[0] = texture_load_png("sprites/link-right-1.png");
-	link_right[1] = texture_load_png("sprites/link-right-2.png");
-	desert[0] = texture_load_png("tiles/desert-1.png");
-	desert[1] = texture_load_png("tiles/desert-2.png");
-	desert_wall_bottom = texture_load_png("tiles/desert-wall-bottom.png");
-	desert_wall_middle = texture_load_png("tiles/desert-wall-middle.png");
-	desert_wall_top = texture_load_png("tiles/desert-wall-top.png");
+	protagonist.load_textures();
+	background.load_textures();
+
+	s._objects.push_back(&protagonist);
 }
 
 static void
@@ -161,258 +156,18 @@ capture()
 	fclose(fp);
 }
 
-static int link_frame = 0;
-static enum {
-	FACE_A,
-	FACE_B,
-	AWAY_A,
-	AWAY_B,
-	LEFT_A,
-	LEFT_B,
-	RIGHT_A,
-	RIGHT_B,
-} link_dir = FACE_A;
-
-static int link_x = 0;
-static int link_y = 0;
-static int link_z = 0;
-
-static int link_vx = 0;
-static int link_vy = 0;
-static int link_vz = 0;
-
-static float camera_x = 0;
-static float camera_y = 2.0 * 256;
-static float camera_z = 0.0 * 256;
-
-static float camera_vx = 0;
-static float camera_vy = 0;
-static float camera_vz = 0;
-
 static void
 display()
 {
 	//glClearColor(1, 1, 1, 0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	glPushMatrix();
-	gluLookAt(camera_x / 256.0, camera_y / 256.0, camera_z / 256.0,
-		link_x / 256.0, link_y + 2.0, link_z / 256.0,
-		0.0, 1.0, 0.0);
-
-	float camera_ax = 1e-3 * (link_x - camera_x)
-		- 0.5 * camera_vx;
-	float camera_ay = 1e-3 * (1 * 256 + link_y - camera_y)
-		- 0.5 * camera_vy;
-	float camera_az = 1e-3 * (4 * 256 + link_z - camera_z)
-		- 0.5 * camera_vz;
-	camera_vx += camera_ax;
-	camera_vy += camera_ay;
-	camera_vz += camera_az;
-
-	camera_x += camera_vx;
-	camera_y += camera_vy;
-	camera_z += camera_vz;
-
-	glTranslatef(-0.5, 0, 0);
-
-	glBindTexture(GL_TEXTURE_2D, desert[0]);
-	glBegin(GL_QUADS);
-	glColor3f(1.0, 1.0, 1.0);
-	for(int y = -4; y < 4; y++) {
-		for(int x = -4; x < 4; x++) {
-			glTexCoord2i(0, 0); glVertex3f(x + 0, 0, y + 0);
-			glTexCoord2i(1, 0); glVertex3f(x + 1, 0, y + 0);
-			glTexCoord2i(1, 1); glVertex3f(x + 1, 0, y + 1);
-			glTexCoord2i(0, 1); glVertex3f(x + 0, 0, y + 1);
-		}
-	}
-	glEnd();
-
-	glBindTexture(GL_TEXTURE_2D, desert_wall_bottom);
-	glBegin(GL_QUADS);
-	for(int x = -4; x < 4; x++) {
-		glTexCoord2i(0, 0); glVertex3f(x + 0, 1, -4);
-		glTexCoord2i(1, 0); glVertex3f(x + 1, 1, -4);
-		glTexCoord2i(1, 1); glVertex3f(x + 1, 0, -4);
-		glTexCoord2i(0, 1); glVertex3f(x + 0, 0, -4);
-
-		glTexCoord2i(0, 0); glVertex3f(-4, 1, x + 1);
-		glTexCoord2i(1, 0); glVertex3f(-4, 1, x + 0);
-		glTexCoord2i(1, 1); glVertex3f(-4, 0, x + 0);
-		glTexCoord2i(0, 1); glVertex3f(-4, 0, x + 1);
-
-		glTexCoord2i(0, 0); glVertex3f(4, 1, x + 0);
-		glTexCoord2i(1, 0); glVertex3f(4, 1, x + 1);
-		glTexCoord2i(1, 1); glVertex3f(4, 0, x + 1);
-		glTexCoord2i(0, 1); glVertex3f(4, 0, x + 0);
-	}
-	glEnd();
-
-	glBindTexture(GL_TEXTURE_2D, desert_wall_middle);
-	glBegin(GL_QUADS);
-	for(int y = 1; y < 3; y++) {
-		for(int x = -4; x < 4; x++) {
-			glTexCoord2i(0, 0); glVertex3f(x + 0, y + 1, -4);
-			glTexCoord2i(1, 0); glVertex3f(x + 1, y + 1, -4);
-			glTexCoord2i(1, 1); glVertex3f(x + 1, y + 0, -4);
-			glTexCoord2i(0, 1); glVertex3f(x + 0, y + 0, -4);
-		}
-	}
-	for(int y = 1; y < 3; y++) {
-		for(int x = -4; x < 4; x++) {
-			glTexCoord2i(0, 0); glVertex3f(-4, y + 1, x + 1);
-			glTexCoord2i(1, 0); glVertex3f(-4, y + 1, x + 0);
-			glTexCoord2i(1, 1); glVertex3f(-4, y + 0, x + 0);
-			glTexCoord2i(0, 1); glVertex3f(-4, y + 0, x + 1);
-		}
-	}
-	for(int y = 1; y < 3; y++) {
-		for(int x = -4; x < 4; x++) {
-			glTexCoord2i(0, 0); glVertex3f(4, y + 1, x + 0);
-			glTexCoord2i(1, 0); glVertex3f(4, y + 1, x + 1);
-			glTexCoord2i(1, 1); glVertex3f(4, y + 0, x + 1);
-			glTexCoord2i(0, 1); glVertex3f(4, y + 0, x + 0);
-		}
-	}
-	glEnd();
-
-	glBindTexture(GL_TEXTURE_2D, desert_wall_top);
-	glBegin(GL_QUADS);
-	for(int x = -4; x < 4; x++) {
-		glTexCoord2i(0, 0); glVertex3f(x + 0, 4, -4);
-		glTexCoord2i(1, 0); glVertex3f(x + 1, 4, -4);
-		glTexCoord2i(1, 1); glVertex3f(x + 1, 3, -4);
-		glTexCoord2i(0, 1); glVertex3f(x + 0, 3, -4);
-
-		glTexCoord2i(0, 0); glVertex3f(-4, 4, x + 1);
-		glTexCoord2i(1, 0); glVertex3f(-4, 4, x + 0);
-		glTexCoord2i(1, 1); glVertex3f(-4, 3, x + 0);
-		glTexCoord2i(0, 1); glVertex3f(-4, 3, x + 1);
-
-		glTexCoord2i(0, 0); glVertex3f(4, 4, x + 0);
-		glTexCoord2i(1, 0); glVertex3f(4, 4, x + 1);
-		glTexCoord2i(1, 1); glVertex3f(4, 3, x + 1);
-		glTexCoord2i(0, 1); glVertex3f(4, 3, x + 0);
-	}
-	glEnd();
-
-	glPushMatrix();
-	glTranslatef(link_x / 256.0, 0, link_z / 256.0);
-
-	switch(link_dir) {
-	case FACE_A:
-		glBindTexture(GL_TEXTURE_2D, link_down[0]);
-		break;
-	case FACE_B:
-		glBindTexture(GL_TEXTURE_2D, link_down[1]);
-		break;
-	case AWAY_A:
-		glBindTexture(GL_TEXTURE_2D, link_up[0]);
-		break;
-	case AWAY_B:
-		glBindTexture(GL_TEXTURE_2D, link_up[1]);
-		break;
-	case LEFT_A:
-		glBindTexture(GL_TEXTURE_2D, link_left[0]);
-		break;
-	case LEFT_B:
-		glBindTexture(GL_TEXTURE_2D, link_left[1]);
-		break;
-	case RIGHT_A:
-		glBindTexture(GL_TEXTURE_2D, link_right[0]);
-		break;
-	case RIGHT_B:
-		glBindTexture(GL_TEXTURE_2D, link_right[1]);
-		break;
-	}
-
-	glBegin(GL_QUADS);
-	glColor3f(1.0, 1.0, 1.0);
-	glTexCoord2i(0, 0); glVertex3f(0.0, 1.0, 0.0);
-	glTexCoord2i(1, 0); glVertex3f(1.0, 1.0, 0.0);
-	glTexCoord2i(1, 1); glVertex3f(1.0, 0.0, 0.0);
-	glTexCoord2i(0, 1); glVertex3f(0.0, 0.0, 0.0);
-	glEnd();
-
-	switch(link_dir) {
-	case FACE_A:
-		glBindTexture(GL_TEXTURE_2D, link_up[0]);
-		break;
-	case FACE_B:
-		glBindTexture(GL_TEXTURE_2D, link_up[1]);
-		break;
-	case AWAY_A:
-		glBindTexture(GL_TEXTURE_2D, link_down[0]);
-		break;
-	case AWAY_B:
-		glBindTexture(GL_TEXTURE_2D, link_down[1]);
-		break;
-	case LEFT_A:
-		glBindTexture(GL_TEXTURE_2D, link_right[0]);
-		break;
-	case LEFT_B:
-		glBindTexture(GL_TEXTURE_2D, link_right[1]);
-		break;
-	case RIGHT_A:
-		glBindTexture(GL_TEXTURE_2D, link_left[0]);
-		break;
-	case RIGHT_B:
-		glBindTexture(GL_TEXTURE_2D, link_left[1]);
-		break;
-	}
-
-	glBegin(GL_QUADS);
-	glColor3f(1.0, 1.0, 1.0);
-	glTexCoord2i(0, 0); glVertex3f(1.0, 1.0, 0.0);
-	glTexCoord2i(1, 0); glVertex3f(0.0, 1.0, 0.0);
-	glTexCoord2i(1, 1); glVertex3f(0.0, 0.0, 0.0);
-	glTexCoord2i(0, 1); glVertex3f(1.0, 0.0, 0.0);
-	glEnd();
-	glPopMatrix();
-
-	glPopMatrix();
-
+	s.draw();
 	glutSwapBuffers();
 
 	if(0)
 		capture();
 
-	if(link_frame == 0) {
-		if(link_vx || link_vz) {
-			switch(link_dir) {
-			case FACE_A:
-				link_dir = FACE_B;
-				break;
-			case FACE_B:
-				link_dir = FACE_A;
-				break;
-			case AWAY_A:
-				link_dir = AWAY_B;
-				break;
-			case AWAY_B:
-				link_dir = AWAY_A;
-				break;
-			case LEFT_A:
-				link_dir = LEFT_B;
-				break;
-			case LEFT_B:
-				link_dir = LEFT_A;
-				break;
-			case RIGHT_A:
-				link_dir = RIGHT_B;
-				break;
-			case RIGHT_B:
-				link_dir = RIGHT_A;
-				break;
-			}
-		}
-	}
-
-	link_frame = (link_frame + 1) % 128;
-	link_x += link_vx;
-	link_y += link_vy;
-	link_z += link_vz;
+	s.update();
 }
 
 static void
@@ -426,13 +181,6 @@ reshape(int width, int height)
 
 	glViewport(0, 0, width, height);
 	gluPerspective(45, (float) width / height, 1, 64);
-
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-
-	gluLookAt(0.0, 6.0, 8.0,
-		0.0, 0.0, 0.0,
-		0.0, 1.0, 0.0);
 }
 
 static void
@@ -460,45 +208,33 @@ static void
 special(int key, int x, int y)
 {
 	switch(key) {
-	case GLUT_KEY_LEFT:
-		if(key_left)
+	case GLUT_KEY_DOWN:
+		if(key_down)
 			break;
-		key_left = 1;
+		key_down = 1;
 
-		if(!(link_vx || link_vz))
-			link_frame = 0;
-		link_vx--;
-		link_dir = LEFT_A;
+		protagonist.walk_forwards();
 		break;
 	case GLUT_KEY_UP:
 		if(key_up)
 			break;
 		key_up = 1;
 
-		if(!(link_vx || link_vz))
-			link_frame = 0;
-		link_vz--;
-		link_dir = AWAY_A;
+		protagonist.walk_backwards();
+		break;
+	case GLUT_KEY_LEFT:
+		if(key_left)
+			break;
+		key_left = 1;
+
+		protagonist.walk_left();
 		break;
 	case GLUT_KEY_RIGHT:
 		if(key_right)
 			break;
 		key_right = 1;
 
-		if(!(link_vx || link_vz))
-			link_frame = 0;
-		link_vx++;
-		link_dir = RIGHT_A;
-		break;
-	case GLUT_KEY_DOWN:
-		if(key_down)
-			break;
-		key_down = 1;
-
-		if(!(link_vx || link_vz))
-			link_frame = 0;
-		link_vz++;
-		link_dir = FACE_A;
+		protagonist.walk_right();
 		break;
 	case GLUT_KEY_F12:
 		capture();
@@ -512,41 +248,33 @@ static void
 specialUp(int key, int x, int y)
 {
 	switch(key) {
-	case GLUT_KEY_LEFT:
-		if(!key_left)
+	case GLUT_KEY_DOWN:
+		if(!key_down)
 			break;
-		key_left = 0;
+		key_down = 0;
 
-		link_vx++;
-		if(!(link_vx || link_vz))
-			link_dir = LEFT_B;
+		protagonist.stop_forwards();
 		break;
 	case GLUT_KEY_UP:
 		if(!key_up)
 			break;
 		key_up = 0;
 
-		link_vz++;
-		if(!(link_vx || link_vz))
-			link_dir = AWAY_B;
+		protagonist.stop_backwards();
+		break;
+	case GLUT_KEY_LEFT:
+		if(!key_left)
+			break;
+		key_left = 0;
+
+		protagonist.stop_left();
 		break;
 	case GLUT_KEY_RIGHT:
 		if(!key_right)
 			break;
 		key_right = 0;
 
-		link_vx--;
-		if(!(link_vx || link_vz))
-			link_dir = RIGHT_B;
-		break;
-	case GLUT_KEY_DOWN:
-		if(!key_down)
-			break;
-		key_down = 0;
-
-		link_vz--;
-		if(!(link_vx || link_vz))
-			link_dir = FACE_B;
+		protagonist.stop_right();
 		break;
 	default:
 		printf("special up %d\n", key);
@@ -577,8 +305,8 @@ int
 main(int argc, char *argv[])
 {
 	glutInit(&argc, argv);
-	glutInitWindowSize(640, 480);
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
+	glutInitWindowSize(640, 480);
 
 	std::srand(std::time(NULL));
 
