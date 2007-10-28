@@ -5,7 +5,6 @@ extern "C" {
 #include <cmath>
 #include <cstdio>
 #include <cstdlib>
-#include <ctime>
 
 extern "C" {
 #include <png.h>
@@ -157,11 +156,60 @@ capture()
 }
 
 static void
+string_stroke(void *font, const char *string)
+{
+	for(const char *c = string; *c; ++c)
+		glutStrokeCharacter(font, *c);
+}
+
+static unsigned int
+string_stroke_width(void *font, const char *string)
+{
+	int sum = 0;
+
+	for(const char *c = string; *c; ++c)
+		sum += glutStrokeWidth(font, *c);
+
+	return sum;
+}
+
+static void
 display()
 {
-	//glClearColor(1, 1, 1, 0);
+	static unsigned int frame = 0;
+	static int time_prev = 0;
+
+	static char fps[10] = "0";
+
+	int time = glutGet(GLUT_ELAPSED_TIME);
+	int delta_time = time > time_prev
+		? time - time_prev : time_prev - time;
+	if(delta_time > 1000) {
+		snprintf(fps, sizeof(fps),
+			"FPS: %d", 1000 * frame / delta_time);
+
+		frame = 0;
+		time_prev = time;
+	}
+
+	frame++;
+
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	s.draw();
+
+	/* Display FPS counter */
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glColor3f(1, 1, 1);
+
+	glPushMatrix();
+	glTranslatef(0, 2, -1);
+	glScalef(1e-2, 1e-2, 1e-2);
+	glTranslatef(
+		-0.5 * string_stroke_width(GLUT_STROKE_ROMAN, fps),
+		0, 0);
+	string_stroke(GLUT_STROKE_ROMAN, fps);
+	glPopMatrix();
+
 	glutSwapBuffers();
 
 	if(0)
@@ -308,8 +356,6 @@ main(int argc, char *argv[])
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
 	glutInitWindowSize(640, 480);
 
-	std::srand(std::time(NULL));
-
 	int window = glutCreateWindow("Link");
 
 	glutIgnoreKeyRepeat(1);
@@ -348,7 +394,6 @@ main(int argc, char *argv[])
 
 	glShadeModel(GL_SMOOTH);
 
-	//glutFullScreen();
 	glutMainLoop();
 
 	glutDestroyWindow(window);
