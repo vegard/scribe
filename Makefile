@@ -1,4 +1,7 @@
-all: a.out
+all: link
 
-a.out: main.cc
-	g++ -Wall -g main.cc -lGL -lGLU -lglut -lpng
+%.o: %.cc
+	g++ -Wall -g -c -o $@ $^
+
+link: $(patsubst %.cc,%.o,$(wildcard *.cc))
+	g++ -Wall -g -o $@ $^ -lGL -lGLU -lglut -lpng
