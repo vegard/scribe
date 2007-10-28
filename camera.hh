@@ -17,8 +17,8 @@ public:
 	void draw();
 
 private:
-	virtual const vector& get_position() const = 0;
-	virtual const vector& get_target() const = 0;
+	virtual const vector get_position() const = 0;
+	virtual const vector get_target() const = 0;
 };
 
 #endif

@@ -26,7 +26,8 @@ extern "C" {
 static character protagonist;
 static background background;
 
-static spring_camera c(protagonist, vector(0, 2, 8), 1e-5, 1e-2);
+static spring_camera c(protagonist, vector(0, 4, 8), vector(0, 1, 0),
+	1e-5, 1e-2);
 static scene s(c, background);
 
 static void

@@ -9,7 +9,7 @@ class spring_camera:
 	public camera
 {
 public:
-	spring_camera(const object& subject, vector distance,
+	spring_camera(const object& subject, vector distance, vector offset,
 		float k, float b);
 	~spring_camera();
 
@@ -21,8 +21,8 @@ public:
 	void update();
 
 private:
-	const vector& get_position() const;
-	const vector& get_target() const;
+	const vector get_position() const;
+	const vector get_target() const;
 
 private:
 	vector _position;
@@ -30,6 +30,7 @@ private:
 
 	const object& _subject;
 	vector _distance;
+	vector _offset;
 
 	float _k;
 	float _b;
