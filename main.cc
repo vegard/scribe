@@ -59,8 +59,8 @@ capture()
 	static unsigned short capture[width * height * 3];
 	glReadPixels(0, 0, width, height, GL_RGB, GL_UNSIGNED_SHORT, capture);
 
-	char *fn;
-	asprintf(&fn, "png/%04d.png", frame - 1);
+	static char fn[32];
+	snprintf(fn, sizeof(fn), "png/%04d.png", frame - 1);
 
 	FILE *fp = fopen(fn, "wb");
 	if(!fp) {
@@ -95,7 +95,6 @@ capture()
 	png_set_rows(png_ptr, info_ptr, rows);
 	png_write_png(png_ptr, info_ptr, PNG_TRANSFORM_IDENTITY, NULL);
 
-	free(fn);
 	fclose(fp);
 }
 
@@ -159,6 +158,20 @@ display()
 		capture();
 
 	s.update();
+}
+
+static void
+idle()
+{
+	static int time_prev = 0;
+
+	int time = glutGet(GLUT_ELAPSED_TIME);
+	if(75 * (time - time_prev) < 1000)
+		return;
+
+	time_prev = time;
+
+	glutPostRedisplay();
 }
 
 static void
@@ -304,7 +317,7 @@ main(int argc, char *argv[])
 	glutIgnoreKeyRepeat(1);
 
 	glutDisplayFunc(&display);
-	glutIdleFunc(&display);
+	glutIdleFunc(&idle);
 	glutReshapeFunc(&reshape);
 	glutKeyboardFunc(&keyboard);
 	glutKeyboardUpFunc(&keyboardUp);

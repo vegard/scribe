@@ -1,13 +1,14 @@
-#include "texture.hh"
-
 extern "C" {
+#include <stdint.h>
+
+#include <GL/gl.h>
+#include <GL/glext.h>
+#include <GL/glu.h>
+
 #include <png.h>
 }
 
-extern "C" {
-#include <GL/gl.h>
-#include <GL/glu.h>
-}
+#include "texture.hh"
 
 texture_map texture::_textures;
 
@@ -59,10 +60,10 @@ texture::load_png(const char *filename)
 	if(png_ptr->color_type == PNG_COLOR_TYPE_RGB) {
 		fprintf(stderr, "error: %s: rgb not implemented\n", filename);
 		gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGBA, 16, 16,
-			GL_RGBA, GL_UNSIGNED_INT_8_8_8_8_REV, image);
+			GL_RGBA, GL_UNSIGNED_BYTE, image);
 	} else if(png_ptr->color_type == PNG_COLOR_TYPE_RGBA) {
 		gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGBA, 16, 16,
-			GL_RGBA, GL_UNSIGNED_INT_8_8_8_8_REV, image);
+			GL_RGBA, GL_UNSIGNED_BYTE, image);
 	} else {
 		fprintf(stderr, "error: %s: unhandled png type\n", filename);
 		exit(1);
