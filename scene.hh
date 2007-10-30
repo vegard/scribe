@@ -17,7 +17,7 @@ private:
 
 public:
 	void draw();
-	void update();
+	void update(unsigned int delta);
 
 public:
 	camera& _camera;

@@ -29,13 +29,13 @@ scene::draw()
 }
 
 void
-scene::update()
+scene::update(unsigned int delta)
 {
-	_camera.update();
+	_camera.update(delta);
 
 	for(object_vector::iterator i = _objects.begin(); i != _objects.end();
 		++i)
 	{
-		(*i)->update();
+		(*i)->update(delta);
 	}
 }

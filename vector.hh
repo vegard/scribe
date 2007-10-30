@@ -8,6 +8,9 @@ public:
 
 public:
 	vector& operator+=(const vector& v);
+	vector& operator-=(const vector& v);
+	vector& operator*=(double d);
+	vector& operator/=(double d);
 
 public:
 	float x;
@@ -17,5 +20,14 @@ public:
 
 vector
 operator+(const vector& a, const vector& b);
+
+vector
+operator-(const vector& a, const vector& b);
+
+vector
+operator*(const vector& a, double d);
+
+vector
+operator/(const vector& a, double d);
 
 #endif

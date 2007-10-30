@@ -13,8 +13,8 @@ private:
 	camera& operator=(const camera&);
 
 public:
-	virtual void update() = 0;
 	void draw();
+	virtual void update(unsigned int delta) = 0;
 
 private:
 	virtual const vector get_position() const = 0;

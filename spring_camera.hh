@@ -18,7 +18,7 @@ private:
 	spring_camera& operator=(const spring_camera&);
 
 public:
-	void update();
+	void update(unsigned int delta);
 
 private:
 	const vector get_position() const;

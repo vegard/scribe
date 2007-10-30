@@ -19,7 +19,7 @@ spring_camera::~spring_camera()
 }
 
 void
-spring_camera::update()
+spring_camera::update(unsigned int delta)
 {
 	const vector& d = _distance;
 	const vector& p = _position;
@@ -34,7 +34,7 @@ spring_camera::update()
 	);
 
 	_velocity += a;
-	_position += _velocity;
+	_position += _velocity * delta;
 }
 
 const vector

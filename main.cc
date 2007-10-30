@@ -26,8 +26,8 @@ extern "C" {
 static character protagonist;
 static background background;
 
-static spring_camera c(protagonist, vector(0, 4, 8), vector(0, 1, 0),
-	1e-5, 1e-2);
+static spring_camera c(protagonist, vector(0, 3, 8), vector(0, 1, 0),
+	1e-7, 5e-2);
 static scene s(c, background);
 
 static void
@@ -121,17 +121,17 @@ display()
 {
 	static unsigned int frame = 0;
 	static int time_prev = 0;
+	static int time_prev_fps = 0;
 
 	static char fps[16] = "FPS: 0";
 
 	int time = glutGet(GLUT_ELAPSED_TIME);
-	int delta_time = time - time_prev;
-	if(delta_time >= 1000) {
+	if(time - time_prev_fps >= 250) {
 		snprintf(fps, sizeof(fps),
-			"FPS: %d", 1000 * frame / delta_time);
+			"FPS: %d", 1000 * frame / (time - time_prev_fps));
 
 		frame = 0;
-		time_prev = time;
+		time_prev_fps = time;
 	}
 
 	frame++;
@@ -157,7 +157,8 @@ display()
 	if(0)
 		capture();
 
-	s.update();
+	s.update(time - time_prev);
+	time_prev = time;
 }
 
 static void
@@ -166,7 +167,7 @@ idle()
 	static int time_prev = 0;
 
 	int time = glutGet(GLUT_ELAPSED_TIME);
-	if(75 * (time - time_prev) < 1000)
+	if(100 * (time - time_prev) < 1000)
 		return;
 
 	time_prev = time;
@@ -184,7 +185,7 @@ reshape(int width, int height)
 	glLoadIdentity();
 
 	glViewport(0, 0, width, height);
-	gluPerspective(45, (float) width / height, 1, 64);
+	gluPerspective(45, (float) width / height, 1, 48);
 }
 
 static void
@@ -340,7 +341,8 @@ main(int argc, char *argv[])
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_FRONT);
 
-	static const GLfloat fog_color[4] = {0.2, 0, 0, 0};
+	glClearColor(0.54, 0.44, 0.28, 0.0);
+	static const GLfloat fog_color[4] = {0.54, 0.44, 0.28, 0};
 	glFogi(GL_FOG_MODE, GL_LINEAR);
 	glFogf(GL_FOG_DENSITY, 1);
 	glFogf(GL_FOG_START, 12);

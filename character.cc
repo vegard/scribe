@@ -61,17 +61,22 @@ character::draw()
 }
 
 void
-character::update()
+character::update(unsigned int delta)
 {
 	bool turn = false;
 
-	_position += _velocity;
+	_acceleration /= 256.0;
+
+	_velocity += _acceleration;
+	_position += _velocity * delta;
+	_acceleration = vector(0, 0, 0);
 
 	if(_frame)
 		turn = false;
 
-	if(_frame++ == 16) {
-		_frame = 0;
+	_frame += delta;
+	if(_frame > 256) {
+		_frame %= 256;
 		turn = true;
 	}
 
@@ -125,7 +130,7 @@ character::walk_forwards()
 {
 	if(!(_velocity.x || _velocity.z))
 		_frame = 0;
-	_velocity.z += 1.0 / 32.0;
+	_acceleration.z += 1.0;
 	_dir = FORWARDS_A;
 }
 
@@ -134,7 +139,7 @@ character::walk_backwards()
 {
 	if(!(_velocity.x || _velocity.z))
 		_frame = 0;
-	_velocity.z -= 1.0 / 32.0;
+	_acceleration.z -= 1.0;
 	_dir = BACKWARDS_A;
 }
 
@@ -143,7 +148,7 @@ character::walk_left()
 {
 	if(!(_velocity.x || _velocity.z))
 		_frame = 0;
-	_velocity.x -= 1.0 / 32.0;
+	_acceleration.x -= 1.0;
 	_dir = LEFT_A;
 }
 
@@ -152,14 +157,14 @@ character::walk_right()
 {
 	if(!(_velocity.x || _velocity.z))
 		_frame = 0;
-	_velocity.x += 1.0 / 32.0;
+	_acceleration.x += 1.0;
 	_dir = RIGHT_A;
 }
 
 void
 character::stop_forwards()
 {
-	_velocity.z -= 1.0 / 32.0;
+	_acceleration.z -= 1.0;
 	if(!(_velocity.x || _velocity.z))
 		_dir = FORWARDS_B;
 }
@@ -167,7 +172,7 @@ character::stop_forwards()
 void
 character::stop_backwards()
 {
-	_velocity.z += 1.0 / 32.0;
+	_acceleration.z += 1.0;
 	if(!(_velocity.x || _velocity.z))
 		_dir = BACKWARDS_B;
 }
@@ -175,7 +180,7 @@ character::stop_backwards()
 void
 character::stop_left()
 {
-	_velocity.x += 1.0 / 32.0;
+	_acceleration.x += 1.0;
 	if(!(_velocity.x || _velocity.z))
 		_dir = LEFT_B;
 }
@@ -183,7 +188,7 @@ character::stop_left()
 void
 character::stop_right()
 {
-	_velocity.x -= 1.0 / 32.0;
+	_acceleration.x -= 1.0;
 	if(!(_velocity.x || _velocity.z))
 		_dir = RIGHT_B;
 }

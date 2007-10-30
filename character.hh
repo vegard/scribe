@@ -22,7 +22,7 @@ public:
 	void load_textures();
 
 	void draw();
-	void update();
+	void update(unsigned int delta);
 
 	const vector& get_position() const;
 	const vector& get_velocity() const;
@@ -40,6 +40,7 @@ public:
 private:
 	vector _position;
 	vector _velocity;
+	vector _acceleration;
 
 	unsigned int _frame;
 

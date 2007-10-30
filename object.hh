@@ -19,7 +19,7 @@ private:
 
 public:
 	virtual void draw() = 0;
-	virtual void update() = 0;
+	virtual void update(unsigned int delta) = 0;
 
 	virtual const vector& get_position() const = 0;
 	virtual const vector& get_velocity() const = 0;

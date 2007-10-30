@@ -21,6 +21,7 @@ camera::draw()
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
+
 	gluLookAt(
 		p.x, p.y, p.z,
 		t.x, t.y, t.z,
