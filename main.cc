@@ -5,6 +5,7 @@ extern "C" {
 #include <cmath>
 #include <cstdio>
 #include <cstdlib>
+#include <iostream>
 
 extern "C" {
 #include <png.h>
@@ -204,41 +205,36 @@ keyboardUp(unsigned char key, int x, int y)
 {
 }
 
-static int key_left = 0;
-static int key_up = 0;
-static int key_right = 0;
-static int key_down = 0;
+static bool special_pressed[256] = {};
 
 static void
 special(int key, int x, int y)
 {
+	if(key < 0 || key > 255) {
+		std::cerr << "warning: Unhandled special key "
+			<< key << std::endl;
+		return;
+	}
+
+	if(special_pressed[key]) {
+		std::cerr << "warning: Received double key-press for special "
+			"key " << key << std::endl;
+		return;
+	}
+
+	special_pressed[key] = true;
+
 	switch(key) {
 	case GLUT_KEY_DOWN:
-		if(key_down)
-			break;
-		key_down = 1;
-
 		protagonist.walk_forwards();
 		break;
 	case GLUT_KEY_UP:
-		if(key_up)
-			break;
-		key_up = 1;
-
 		protagonist.walk_backwards();
 		break;
 	case GLUT_KEY_LEFT:
-		if(key_left)
-			break;
-		key_left = 1;
-
 		protagonist.walk_left();
 		break;
 	case GLUT_KEY_RIGHT:
-		if(key_right)
-			break;
-		key_right = 1;
-
 		protagonist.walk_right();
 		break;
 	case GLUT_KEY_F12:
@@ -252,33 +248,31 @@ special(int key, int x, int y)
 static void
 specialUp(int key, int x, int y)
 {
+	if(key < 0 || key > 255) {
+		std::cerr << "warning: Unhandled special key "
+			<< key << std::endl;
+		return;
+	}
+
+	if(!special_pressed[key]) {
+		std::cerr << "warning: Received phantom key-release for "
+			"special key " << key << std::endl;
+		return;
+	}
+
+	special_pressed[key] = false;
+
 	switch(key) {
 	case GLUT_KEY_DOWN:
-		if(!key_down)
-			break;
-		key_down = 0;
-
 		protagonist.stop_forwards();
 		break;
 	case GLUT_KEY_UP:
-		if(!key_up)
-			break;
-		key_up = 0;
-
 		protagonist.stop_backwards();
 		break;
 	case GLUT_KEY_LEFT:
-		if(!key_left)
-			break;
-		key_left = 0;
-
 		protagonist.stop_left();
 		break;
 	case GLUT_KEY_RIGHT:
-		if(!key_right)
-			break;
-		key_right = 0;
-
 		protagonist.stop_right();
 		break;
 	default:
