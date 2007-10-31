@@ -1,4 +1,7 @@
+#include <stdexcept>
+
 extern "C" {
+#include <errno.h>
 #include <stdint.h>
 
 #include <GL/gl.h>
@@ -9,6 +12,8 @@ extern "C" {
 }
 
 #include "texture.hh"
+
+#include "sys/error.hh"
 
 texture_map texture::_textures;
 
@@ -54,45 +59,77 @@ texture::load_png(texture* texture, const char* filename)
 {
 	FILE *fp = fopen(filename, "rb");
 	if(!fp)
-		exit(1);
+		throw sys::error(errno);
 
 	png_structp png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING,
 		NULL, NULL, NULL);
-	if(!png_ptr)
-		exit(1);
+	if(!png_ptr) {
+		fclose(fp);
+		throw std::runtime_error("Out of memory");
+	}
 
 	png_infop info_ptr = png_create_info_struct(png_ptr);
-	if(!info_ptr)
-		exit(1);
+	if(!info_ptr) {
+		png_destroy_read_struct(&png_ptr, NULL, NULL);
+		fclose(fp);
+		throw std::runtime_error("Out of memory");
+	}
 
 	png_init_io(png_ptr, fp);
-
-	uint8_t *image = new uint8_t[4 * 16 * 16];
-	png_bytep row_pointers[16];
-
-	for(int i = 0; i < 16; i++)
-		row_pointers[i] = &image[4 * 16 * i];
-
-	png_set_rows(png_ptr, info_ptr, row_pointers);
 	png_read_png(png_ptr, info_ptr, PNG_TRANSFORM_IDENTITY, NULL);
 
-	if(png_ptr->color_type == PNG_COLOR_TYPE_RGB) {
-		fprintf(stderr, "error: %s: rgb not implemented\n", filename);
+	if(info_ptr->bit_depth != 8) {
+		png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
+		fclose(fp);
+		throw std::runtime_error("Unsupported texture bit depth");
+	}
 
+	if((info_ptr->width & (info_ptr->width - 1)) || !info_ptr) {
+		png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
+		fclose(fp);
+		throw std::runtime_error("Unsupported texture width");
+	}
+
+	if((info_ptr->height & (info_ptr->height - 1)) || !info_ptr) {
+		png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
+		fclose(fp);
+		throw std::runtime_error("Unsupported texture height");
+	}
+
+	texture->_width = info_ptr->width;
+	texture->_height = info_ptr->height;
+
+	png_bytep *row_pointers = png_get_rows(png_ptr, info_ptr);
+	uint8_t *image = new uint8_t[info_ptr->channels
+		* info_ptr->width * info_ptr->height];
+
+	unsigned int stride = info_ptr->width * info_ptr->channels;
+	for(unsigned int y = 0; y < info_ptr->height; ++y) {
+		png_bytep src_row = row_pointers[y];
+		uint8_t *dst_row = &image[stride * y];
+
+		for(unsigned int x = 0; x < stride; ++x)
+			dst_row[x] = src_row[x];
+	}
+
+	if(png_ptr->color_type == PNG_COLOR_TYPE_RGB) {
 		texture->bind();
-		gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGBA, 16, 16,
-			GL_RGBA, GL_UNSIGNED_BYTE, image);
+		gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGB,
+			info_ptr->width, info_ptr->height,
+			GL_RGB, GL_UNSIGNED_BYTE, image);
 	} else if(png_ptr->color_type == PNG_COLOR_TYPE_RGBA) {
 		texture->bind();
-		gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGBA, 16, 16,
+		gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGBA,
+			info_ptr->width, info_ptr->height,
 			GL_RGBA, GL_UNSIGNED_BYTE, image);
 	} else {
-		fprintf(stderr, "error: %s: unhandled png type\n", filename);
-		exit(1);
+		delete[] image;
+		png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
+		fclose(fp);
+		throw std::runtime_error("Unsupported PNG type");
 	}
 
 	delete[] image;
 	png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
-
 	fclose(fp);
 }
