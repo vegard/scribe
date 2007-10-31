@@ -59,6 +59,13 @@ operator*(const vector& a, double d)
 	return t *= d;
 }
 
+vector
+operator*(double d, const vector& a)
+{
+	vector t(a);
+	return t *= d;
+}
+
 vector&
 vector::operator/=(double d)
 {
@@ -70,6 +77,13 @@ vector::operator/=(double d)
 
 vector
 operator/(const vector& a, double d)
+{
+	vector t(a);
+	return t /= d;
+}
+
+vector
+operator/(double d, const vector& a)
 {
 	vector t(a);
 	return t /= d;

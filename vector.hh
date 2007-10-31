@@ -28,6 +28,12 @@ vector
 operator*(const vector& a, double d);
 
 vector
+operator*(double d, const vector& a);
+
+vector
 operator/(const vector& a, double d);
+
+vector
+operator/(double d, const vector& a);
 
 #endif
