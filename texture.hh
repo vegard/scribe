@@ -2,19 +2,36 @@
 #define TEXTURE_HH
 
 #include <map>
+#include <string>
 
 extern "C" {
 #include <GL/gl.h>
 }
 
-typedef std::map<const char*, GLuint> texture_map;
+class texture;
+typedef std::map<std::string, texture*> texture_map;
 
 class texture {
+private:
+	texture();
+	~texture();
+
+	texture(const texture&);
+	texture& operator=(const texture&);
+
 public:
-	static GLuint get_png(const char* filename);
+	void bind() const;
 
 private:
-	static GLuint load_png(const char* filename);
+	GLuint _id;
+	GLsizei _width;
+	GLsizei _height;
+
+public:
+	static const texture* get_png(const std::string& filename);
+
+private:
+	static void load_png(texture* texture, const char* filename);
 
 private:
 	static texture_map _textures;

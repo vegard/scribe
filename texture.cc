@@ -12,21 +12,45 @@ extern "C" {
 
 texture_map texture::_textures;
 
-GLuint
-texture::get_png(const char *filename)
+texture::texture()
+{
+	glGenTextures(1, &_id);
+
+	glBindTexture(GL_TEXTURE_2D, _id);
+	glTexParameteri(GL_TEXTURE_2D,
+		GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D,
+		GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+}
+
+texture::~texture()
+{
+	glDeleteTextures(1, &_id);
+}
+
+void
+texture::bind() const
+{
+	glBindTexture(GL_TEXTURE_2D, _id);
+}
+
+const texture*
+texture::get_png(const std::string& filename)
 {
 	texture_map::iterator i = _textures.find(filename);
 
 	if(i != _textures.end())
 		return i->second;
 
-	GLuint t = load_png(filename);
+	texture* t = new texture();
+	load_png(t, filename.c_str());
 	_textures[filename] = t;
 	return t;
 }
 
-GLuint
-texture::load_png(const char *filename)
+void
+texture::load_png(texture* texture, const char* filename)
 {
 	FILE *fp = fopen(filename, "rb");
 	if(!fp)
@@ -52,16 +76,14 @@ texture::load_png(const char *filename)
 	png_set_rows(png_ptr, info_ptr, row_pointers);
 	png_read_png(png_ptr, info_ptr, PNG_TRANSFORM_IDENTITY, NULL);
 
-	GLuint texture;
-
-	glGenTextures(1, &texture);
-	glBindTexture(GL_TEXTURE_2D, texture);
-
 	if(png_ptr->color_type == PNG_COLOR_TYPE_RGB) {
 		fprintf(stderr, "error: %s: rgb not implemented\n", filename);
+
+		texture->bind();
 		gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGBA, 16, 16,
 			GL_RGBA, GL_UNSIGNED_BYTE, image);
 	} else if(png_ptr->color_type == PNG_COLOR_TYPE_RGBA) {
+		texture->bind();
 		gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGBA, 16, 16,
 			GL_RGBA, GL_UNSIGNED_BYTE, image);
 	} else {
@@ -69,15 +91,8 @@ texture::load_png(const char *filename)
 		exit(1);
 	}
 
-	glBindTexture(GL_TEXTURE_2D, texture);
-	glTexParameteri(GL_TEXTURE_2D,
-		GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D,
-		GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
+	delete[] image;
 	png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
 
 	fclose(fp);
-
-	return texture;
 }

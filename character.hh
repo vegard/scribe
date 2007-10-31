@@ -7,6 +7,8 @@ extern "C" {
 #include "GL/gl.h"
 }
 
+class texture;
+
 class character:
 	public object
 {
@@ -65,7 +67,7 @@ private:
 
 	unsigned int _frame;
 
-	GLuint textures[8];
+	const texture* textures[8];
 };
 
 #endif

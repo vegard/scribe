@@ -37,7 +37,7 @@ character::draw()
 	glColor3f(1.0, 1.0, 1.0);
 
 	/* Draw front */
-	glBindTexture(GL_TEXTURE_2D, textures[_dir]);
+	textures[_dir]->bind();
 
 	glBegin(GL_QUADS);
 	glTexCoord2i(0, 0); glVertex3f(0.0, 1.0, 0.0);
@@ -47,7 +47,7 @@ character::draw()
 	glEnd();
 
 	/* Draw back */
-	glBindTexture(GL_TEXTURE_2D, textures[_dir ^ 2]);
+	textures[_dir ^ 2]->bind();
 
 	glBegin(GL_QUADS);
 	glTexCoord2i(0, 0); glVertex3f(1.0, 1.0, 0.0);

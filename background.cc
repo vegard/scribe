@@ -13,10 +13,10 @@ background::~background()
 {
 }
 
-static GLuint desert[2];
-static GLuint desert_wall_bottom;
-static GLuint desert_wall_middle;
-static GLuint desert_wall_top;
+static const texture* desert[2];
+static const texture* desert_wall_bottom;
+static const texture* desert_wall_middle;
+static const texture* desert_wall_top;
 
 void
 background::load_textures()
@@ -33,7 +33,7 @@ background::draw()
 {
 	glColor3f(1.0, 1.0, 1.0);
 
-	glBindTexture(GL_TEXTURE_2D, desert[0]);
+	desert[0]->bind();
 	glBegin(GL_QUADS);
 	for(int y = -4; y < 4; y++) {
 		for(int x = -4; x < 4; x++) {
@@ -45,7 +45,7 @@ background::draw()
 	}
 	glEnd();
 
-	glBindTexture(GL_TEXTURE_2D, desert_wall_bottom);
+	desert_wall_bottom->bind();
 	glBegin(GL_QUADS);
 	for(int x = -4; x < 4; x++) {
 		glTexCoord2i(0, 0); glVertex3f(x + 0, 1, -4);
@@ -65,7 +65,7 @@ background::draw()
 	}
 	glEnd();
 
-	glBindTexture(GL_TEXTURE_2D, desert_wall_middle);
+	desert_wall_middle->bind();
 	glBegin(GL_QUADS);
 	for(int y = 1; y < 3; y++) {
 		for(int x = -4; x < 4; x++) {
@@ -93,7 +93,7 @@ background::draw()
 	}
 	glEnd();
 
-	glBindTexture(GL_TEXTURE_2D, desert_wall_top);
+	desert_wall_top->bind();
 	glBegin(GL_QUADS);
 	for(int x = -4; x < 4; x++) {
 		glTexCoord2i(0, 0); glVertex3f(x + 0, 4, -4);
