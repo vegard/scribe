@@ -47,7 +47,7 @@ character::draw()
 	glEnd();
 
 	/* Draw back */
-	glBindTexture(GL_TEXTURE_2D, textures[_dir ^ 1]);
+	glBindTexture(GL_TEXTURE_2D, textures[_dir ^ 2]);
 
 	glBegin(GL_QUADS);
 	glTexCoord2i(0, 0); glVertex3f(1.0, 1.0, 0.0);
