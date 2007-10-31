@@ -24,8 +24,8 @@ public:
 	void draw();
 	void update(unsigned int delta);
 
-	const vector& get_position() const;
-	const vector& get_velocity() const;
+	const vector get_position() const;
+	const vector get_velocity() const;
 
 	void walk_forwards();
 	void walk_backwards();
@@ -39,12 +39,20 @@ public:
 
 private:
 	vector _position;
-	vector _velocity;
-	vector _acceleration;
 
-	unsigned int _frame;
+	enum {
+		RESTING,
+		WALKING_FORWARDS,
+		WALKING_BACKWARDS,
+		WALKING_LEFT,
+		WALKING_RIGHT,
+		WALKING_FORWARDS_LEFT,
+		WALKING_BACKWARDS_LEFT,
+		WALKING_FORWARDS_RIGHT,
+		WALKING_BACKWARDS_RIGHT,
+	} _state;
 
-	enum state {
+	enum {
 		FORWARDS_A,
 		FORWARDS_B,
 		BACKWARDS_A,
@@ -54,6 +62,8 @@ private:
 		RIGHT_A,
 		RIGHT_B,
 	} _dir;
+
+	unsigned int _frame;
 
 	GLuint textures[8];
 };

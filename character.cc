@@ -63,27 +63,17 @@ character::draw()
 void
 character::update(unsigned int delta)
 {
-	bool turn = false;
+	const vector& v = get_velocity();
 
-	_acceleration /= 256.0;
+	if(_state == RESTING)
+		return;
 
-	_velocity += _acceleration;
-	_position += _velocity * delta;
-	_acceleration = vector(0, 0, 0);
-
-	if(_frame)
-		turn = false;
+	_position += v * delta;
 
 	_frame += delta;
 	if(_frame > 256) {
 		_frame %= 256;
-		turn = true;
-	}
 
-	if(!turn)
-		return;
-
-	if(_velocity.x || _velocity.z) {
 		switch(_dir) {
 		case FORWARDS_A:
 			_dir = FORWARDS_B;
@@ -113,82 +103,202 @@ character::update(unsigned int delta)
 	}
 }
 
-const vector&
+const vector
 character::get_position() const
 {
 	return _position;
 }
 
-const vector&
+const vector
 character::get_velocity() const
 {
-	return _velocity;
+	static const vector v[] = {
+		vector( 0,  0,  0),
+		vector( 0,  0,  1),
+		vector( 0,  0, -1),
+		vector(-1,  0,  0),
+		vector( 1,  0,  0),
+		vector(-0.71,  0,  0.71),
+		vector(-0.71,  0, -0.71),
+		vector( 0.71,  0,  0.71),
+		vector( 0.71,  0, -0.71),
+	};
+
+	return v[_state] / 256;
 }
 
 void
 character::walk_forwards()
 {
-	if(!(_velocity.x || _velocity.z))
+	switch(_state) {
+	case RESTING:
+		_state = WALKING_FORWARDS;
+		_dir = FORWARDS_A;
 		_frame = 0;
-	_acceleration.z += 1.0;
-	_dir = FORWARDS_A;
+		break;
+	case WALKING_LEFT:
+		_state = WALKING_FORWARDS_LEFT;
+		_dir = FORWARDS_A;
+		break;
+	case WALKING_RIGHT:
+		_state = WALKING_FORWARDS_RIGHT;
+		_dir = FORWARDS_A;
+		break;
+	default:
+		break;
+	}
 }
 
 void
 character::walk_backwards()
 {
-	if(!(_velocity.x || _velocity.z))
+	switch(_state) {
+	case RESTING:
+		_state = WALKING_BACKWARDS;
+		_dir = BACKWARDS_A;
 		_frame = 0;
-	_acceleration.z -= 1.0;
-	_dir = BACKWARDS_A;
+		break;
+	case WALKING_LEFT:
+		_state = WALKING_BACKWARDS_LEFT;
+		_dir = BACKWARDS_A;
+		break;
+	case WALKING_RIGHT:
+		_state = WALKING_BACKWARDS_RIGHT;
+		_dir = BACKWARDS_A;
+		break;
+	default:
+		break;
+	}
 }
 
 void
 character::walk_left()
 {
-	if(!(_velocity.x || _velocity.z))
+	switch(_state) {
+	case RESTING:
+		_state = WALKING_LEFT;
+		_dir = LEFT_A;
 		_frame = 0;
-	_acceleration.x -= 1.0;
-	_dir = LEFT_A;
+		break;
+	case WALKING_FORWARDS:
+		_state = WALKING_FORWARDS_LEFT;
+		_dir = LEFT_A;
+		break;
+	case WALKING_BACKWARDS:
+		_state = WALKING_BACKWARDS_LEFT;
+		_dir = LEFT_A;
+		break;
+	default:
+		break;
+	}
 }
 
 void
 character::walk_right()
 {
-	if(!(_velocity.x || _velocity.z))
+	switch(_state) {
+	case RESTING:
+		_state = WALKING_RIGHT;
+		_dir = RIGHT_A;
 		_frame = 0;
-	_acceleration.x += 1.0;
-	_dir = RIGHT_A;
+		break;
+	case WALKING_FORWARDS:
+		_state = WALKING_FORWARDS_RIGHT;
+		_dir = RIGHT_A;
+		break;
+	case WALKING_BACKWARDS:
+		_state = WALKING_BACKWARDS_RIGHT;
+		_dir = RIGHT_A;
+		break;
+	default:
+		break;
+	}
 }
 
 void
 character::stop_forwards()
 {
-	_acceleration.z -= 1.0;
-	if(!(_velocity.x || _velocity.z))
+	switch(_state) {
+	case WALKING_FORWARDS:
+		_state = RESTING;
 		_dir = FORWARDS_B;
+		_frame = 0;
+		break;
+	case WALKING_FORWARDS_LEFT:
+		_state = WALKING_LEFT;
+		_dir = LEFT_B;
+		break;
+	case WALKING_FORWARDS_RIGHT:
+		_state = WALKING_RIGHT;
+		_dir = RIGHT_B;
+		break;
+	default:
+		break;
+	}
 }
 
 void
 character::stop_backwards()
 {
-	_acceleration.z += 1.0;
-	if(!(_velocity.x || _velocity.z))
+	switch(_state) {
+	case WALKING_BACKWARDS:
+		_state = RESTING;
 		_dir = BACKWARDS_B;
+		_frame = 0;
+		break;
+	case WALKING_BACKWARDS_LEFT:
+		_state = WALKING_LEFT;
+		_dir = LEFT_B;
+		break;
+	case WALKING_BACKWARDS_RIGHT:
+		_state = WALKING_RIGHT;
+		_dir = RIGHT_B;
+		break;
+	default:
+		break;
+	}
 }
 
 void
 character::stop_left()
 {
-	_acceleration.x += 1.0;
-	if(!(_velocity.x || _velocity.z))
+	switch(_state) {
+	case WALKING_LEFT:
+		_state = RESTING;
 		_dir = LEFT_B;
+		_frame = 0;
+		break;
+	case WALKING_FORWARDS_LEFT:
+		_state = WALKING_FORWARDS;
+		_dir = FORWARDS_B; 
+		break;
+	case WALKING_BACKWARDS_LEFT:
+		_state = WALKING_BACKWARDS;
+		_dir = BACKWARDS_B;
+		break;
+	default:
+		break;
+	}
 }
 
 void
 character::stop_right()
 {
-	_acceleration.x -= 1.0;
-	if(!(_velocity.x || _velocity.z))
+	switch(_state) {
+	case WALKING_RIGHT:
+		_state = RESTING;
 		_dir = RIGHT_B;
+		_frame = 0;
+		break;
+	case WALKING_FORWARDS_RIGHT:
+		_state = WALKING_FORWARDS;
+		_dir = FORWARDS_B;
+		break;
+	case WALKING_BACKWARDS_RIGHT:
+		_state = WALKING_BACKWARDS;
+		_dir = BACKWARDS_B;
+		break;
+	default:
+		break;
+	}
 }
