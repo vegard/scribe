@@ -27,7 +27,7 @@ spring_camera::update(unsigned int delta)
 	const vector& sp = _subject.get_position();
 	const vector& sv = _subject.get_velocity();
 
-	vector a = _k * (d + sp - p) + _b * (sv - v);
+	vector a = _k * (d + sp - p) + _b * delta * (sv - v);
 
 	_velocity += a;
 	_position += _velocity * delta;
