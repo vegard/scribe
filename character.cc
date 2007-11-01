@@ -1,3 +1,5 @@
+#include <cmath>
+
 #include "character.hh"
 #include "texture.hh"
 
@@ -30,6 +32,31 @@ character::load_textures()
 void
 character::draw()
 {
+	if(_tracking) {
+		glPushMatrix();
+		glTranslatef(
+			std::floor(_position.x),
+			std::floor(_position.y),
+			std::floor(_position.z)
+		);
+
+		glPolygonOffset(0.0, -1.0);
+
+		glBindTexture(GL_TEXTURE_2D, 0);
+		glColor4f(1.0, 1.0, 1.0, 0.25);
+
+		glBegin(GL_QUADS);
+		glVertex3f(1.0, 0.0, 0.0);
+		glVertex3f(1.0, 0.0, 1.0);
+		glVertex3f(0.0, 0.0, 1.0);
+		glVertex3f(0.0, 0.0, 0.0);
+		glEnd();
+
+		glPolygonOffset(0.0, 0.0);
+
+		glPopMatrix();
+	}
+
 	glPushMatrix();
 	glTranslatef(-0.5, 0, 0);
 	glTranslatef(_position.x, _position.y, _position.z);
@@ -55,7 +82,6 @@ character::draw()
 	glTexCoord2i(1, 1); glVertex3f(0.0, 0.0, 0.0);
 	glTexCoord2i(0, 1); glVertex3f(1.0, 0.0, 0.0);
 	glEnd();
-	glPopMatrix();
 
 	glPopMatrix();
 }
@@ -301,4 +327,10 @@ character::stop_right()
 	default:
 		break;
 	}
+}
+
+void
+character::set_tracking(bool tracking)
+{
+	_tracking = tracking;
 }

@@ -238,6 +238,12 @@ special(int key, int x, int y)
 	case GLUT_KEY_RIGHT:
 		protagonist.walk_right();
 		break;
+	case GLUT_KEY_F1: {
+		static bool tracking = false;
+		tracking = !tracking;
+		protagonist.set_tracking(tracking);
+		break;
+	}
 	case GLUT_KEY_F12:
 		capture();
 		break;
@@ -327,6 +333,9 @@ main(int argc, char *argv[])
 	init();
 
 	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LEQUAL);
+
+	glEnable(GL_POLYGON_OFFSET_FILL);
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

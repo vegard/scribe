@@ -39,6 +39,8 @@ public:
 	void stop_left();
 	void stop_right();
 
+	void set_tracking(bool tracking);
+
 private:
 	vector _position;
 
@@ -68,6 +70,8 @@ private:
 	unsigned int _frame;
 
 	const texture* textures[8];
+
+	bool _tracking;
 };
 
 #endif
