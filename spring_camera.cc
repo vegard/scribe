@@ -4,7 +4,8 @@
 #include "vector.hh"
 
 spring_camera::spring_camera(const object& subject,
-	vector distance, vector offset, float k, float b):
+	const vector& distance, const vector& offset,
+	float k, float b):
 	_position(subject.get_position() + distance),
 	_subject(subject),
 	_distance(distance),
@@ -31,6 +32,18 @@ spring_camera::update(unsigned int delta)
 
 	_velocity += a;
 	_position += _velocity * delta;
+}
+
+void
+spring_camera::set_distance(const vector& distance)
+{
+	_distance = distance;
+}
+
+void
+spring_camera::set_offset(const vector& offset)
+{
+	_offset = offset;
 }
 
 const vector

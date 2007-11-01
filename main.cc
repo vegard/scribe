@@ -24,13 +24,26 @@ extern "C" {
 #include "spring_camera.hh"
 #include "vector.hh"
 
+static int camera_zoom = 8;
+
+static const vector& get_camera_distance()
+{
+	static const double camera_angle = 20.0 * M_PI / 180;
+	static vector v;
+
+	v = vector(0,
+		camera_zoom * sin(camera_angle),
+		camera_zoom * cos(camera_angle));
+	return v;
+}
+
 static character protagonist;
 static background background;
 
-static spring_camera c(protagonist,
-	vector(0, 3, 8), vector(0, 1, 0),
+static spring_camera camera(protagonist,
+	get_camera_distance(), vector(0, 1, 0),
 	1e-5, 2e-3);
-static scene s(c, background);
+static scene scene(camera, background);
 
 static void
 init()
@@ -38,7 +51,7 @@ init()
 	protagonist.load_textures();
 	background.load_textures();
 
-	s._objects.push_back(&protagonist);
+	scene._objects.push_back(&protagonist);
 }
 
 static void
@@ -139,7 +152,7 @@ display()
 	frame++;
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	s.draw();
+	scene.draw();
 
 	/* Display FPS counter */
 	glBindTexture(GL_TEXTURE_2D, 0);
@@ -159,7 +172,7 @@ display()
 	if(0)
 		capture();
 
-	s.update(time - time_prev);
+	scene.update(time - time_prev);
 	time_prev = time;
 }
 
@@ -196,6 +209,20 @@ keyboard(unsigned char key, int x, int y)
 	switch(key) {
 	case 27:
 		exit(0);
+	case '-':
+		if(camera_zoom >= 16)
+			break;
+
+		camera_zoom++;
+		camera.set_distance(get_camera_distance());
+		break;
+	case '+':
+		if(camera_zoom <= 4)
+			break;
+
+		camera_zoom--;
+		camera.set_distance(get_camera_distance());
+		break;
 	default:
 		printf("key %d\n", key);
 	}
