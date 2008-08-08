@@ -59,7 +59,7 @@ character::draw()
 	}
 
 	glPushMatrix();
-	glTranslatef(-0.5, 0.002, 0);
+	glTranslatef(0, 0.002, 0);
 	glTranslatef(_position.x, 0, _position.z);
 
 	glColor3f(1.0, 1.0, 1.0);
@@ -67,13 +67,20 @@ character::draw()
 	/* Draw shadow */
 	shadow_texture->bind();
 
+	glPushMatrix();
+
+	glScalef(1 - 0.4 * _position.y, 1.0, 1 - 0.4 * _position.y);
+
 	glBegin(GL_QUADS);
-	glTexCoord2i(0, 0); glVertex3f(0.0, 0.0, -0.5);
-	glTexCoord2i(1, 0); glVertex3f(1.0, 0.0, -0.5);
-	glTexCoord2i(1, 1); glVertex3f(1.0, 0.0, 0.5);
-	glTexCoord2i(0, 1); glVertex3f(0.0, 0.0, 0.5);
+	glTexCoord2i(0, 0); glVertex3f(-0.5, 0.0, -0.5);
+	glTexCoord2i(1, 0); glVertex3f(0.5, 0.0, -0.5);
+	glTexCoord2i(1, 1); glVertex3f(0.5, 0.0, 0.5);
+	glTexCoord2i(0, 1); glVertex3f(-0.5, 0.0, 0.5);
 	glEnd();
 
+	glPopMatrix();
+
+	glTranslatef(-0.5, 0, 0);
 	glTranslatef(0, _position.y, 0);
 
 	/* Draw front */
