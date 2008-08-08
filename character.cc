@@ -8,7 +8,9 @@ extern "C" {
 #include <GL/glu.h>
 }
 
-character::character()
+character::character():
+	_state(RESTING),
+	_jumping(false)
 {
 }
 
@@ -58,7 +60,7 @@ character::draw()
 
 	glPushMatrix();
 	glTranslatef(-0.5, 0.002, 0);
-	glTranslatef(_position.x, _position.y, _position.z);
+	glTranslatef(_position.x, 0, _position.z);
 
 	glColor3f(1.0, 1.0, 1.0);
 
@@ -71,6 +73,8 @@ character::draw()
 	glTexCoord2i(1, 1); glVertex3f(1.0, 0.0, 0.5);
 	glTexCoord2i(0, 1); glVertex3f(0.0, 0.0, 0.5);
 	glEnd();
+
+	glTranslatef(0, _position.y, 0);
 
 	/* Draw front */
 	textures[_dir]->bind();
@@ -98,12 +102,20 @@ character::draw()
 void
 character::update(unsigned int delta)
 {
-	const vector& v = get_velocity();
+	if(_jumping)
+		_velocity += vector(0, -0.0003, 0);
 
-	if(_state == RESTING)
-		return;
+	const vector& v = get_velocity() + _velocity;
 
 	_position += v * delta;
+	if(_position.y < 0) {
+		_position.y = 0;
+		_jumping = false;
+		_velocity = 0;
+	}
+
+	if(_state == RESTING || _jumping)
+		return;
 
 	_frame += delta;
 	if(_frame > 256) {
@@ -336,6 +348,16 @@ character::stop_right()
 	default:
 		break;
 	}
+}
+
+void
+character::jump()
+{
+	if(_jumping)
+		return;
+
+	_velocity = vector(0, 0.008, 0);
+	_jumping = true;
 }
 
 void

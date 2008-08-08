@@ -209,6 +209,9 @@ keyboard(unsigned char key, int x, int y)
 	switch(key) {
 	case 27:
 		exit(0);
+	case ' ':
+		protagonist.jump();
+		break;
 	case '-':
 		if(camera_zoom >= 16)
 			break;

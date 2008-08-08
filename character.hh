@@ -39,10 +39,13 @@ public:
 	void stop_left();
 	void stop_right();
 
+	void jump();
+
 	void set_tracking(bool tracking);
 
 private:
 	vector _position;
+	vector _velocity;
 
 	enum {
 		RESTING,
@@ -55,6 +58,8 @@ private:
 		WALKING_FORWARDS_RIGHT,
 		WALKING_BACKWARDS_RIGHT,
 	} _state;
+
+	bool _jumping;
 
 	enum {
 		FORWARDS_A,
