@@ -27,6 +27,8 @@ character::load_textures()
 	textures[5] = texture::get_png("sprites/link-left-2.png");
 	textures[6] = texture::get_png("sprites/link-right-1.png");
 	textures[7] = texture::get_png("sprites/link-right-2.png");
+
+	shadow_texture = texture::get_png("sprites/shadow.png");
 }
 
 void
@@ -34,13 +36,12 @@ character::draw()
 {
 	if(_tracking) {
 		glPushMatrix();
+		glTranslatef(0, 0.001, 0);
 		glTranslatef(
 			std::floor(_position.x),
 			std::floor(_position.y),
 			std::floor(_position.z)
 		);
-
-		glPolygonOffset(0.0, -1.0);
 
 		glBindTexture(GL_TEXTURE_2D, 0);
 		glColor4f(1.0, 1.0, 1.0, 0.25);
@@ -52,16 +53,24 @@ character::draw()
 		glVertex3f(0.0, 0.0, 0.0);
 		glEnd();
 
-		glPolygonOffset(0.0, 0.0);
-
 		glPopMatrix();
 	}
 
 	glPushMatrix();
-	glTranslatef(-0.5, 0, 0);
+	glTranslatef(-0.5, 0.002, 0);
 	glTranslatef(_position.x, _position.y, _position.z);
 
 	glColor3f(1.0, 1.0, 1.0);
+
+	/* Draw shadow */
+	shadow_texture->bind();
+
+	glBegin(GL_QUADS);
+	glTexCoord2i(0, 0); glVertex3f(0.0, 0.0, -0.5);
+	glTexCoord2i(1, 0); glVertex3f(1.0, 0.0, -0.5);
+	glTexCoord2i(1, 1); glVertex3f(1.0, 0.0, 0.5);
+	glTexCoord2i(0, 1); glVertex3f(0.0, 0.0, 0.5);
+	glEnd();
 
 	/* Draw front */
 	textures[_dir]->bind();

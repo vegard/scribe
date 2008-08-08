@@ -70,6 +70,7 @@ private:
 	unsigned int _frame;
 
 	const texture* textures[8];
+	const texture* shadow_texture;
 
 	bool _tracking;
 };
