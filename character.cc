@@ -188,19 +188,19 @@ character::walk_forwards()
 	switch(_state) {
 	case RESTING:
 		_state = WALKING_FORWARDS;
-		_state_frame = 0;
+		_state_frame = 1;
 		_dir = FORWARDS;
 		_frame = 0;
 		break;
 	case WALKING_LEFT:
 		_state = WALKING_FORWARDS_LEFT;
 		_dir = FORWARDS;
-		_state_frame = 0;
+		_state_frame = 1;
 		break;
 	case WALKING_RIGHT:
 		_state = WALKING_FORWARDS_RIGHT;
 		_dir = FORWARDS;
-		_state_frame = 0;
+		_state_frame = 1;
 		break;
 	default:
 		break;
@@ -213,18 +213,18 @@ character::walk_backwards()
 	switch(_state) {
 	case RESTING:
 		_state = WALKING_BACKWARDS;
-		_state_frame = 0;
+		_state_frame = 1;
 		_dir = BACKWARDS;
 		_frame = 0;
 		break;
 	case WALKING_LEFT:
 		_state = WALKING_BACKWARDS_LEFT;
-		_state_frame = 0;
+		_state_frame = 1;
 		_dir = BACKWARDS;
 		break;
 	case WALKING_RIGHT:
 		_state = WALKING_BACKWARDS_RIGHT;
-		_state_frame = 0;
+		_state_frame = 1;
 		_dir = BACKWARDS;
 		break;
 	default:
@@ -238,18 +238,18 @@ character::walk_left()
 	switch(_state) {
 	case RESTING:
 		_state = WALKING_LEFT;
-		_state_frame = 0;
+		_state_frame = 1;
 		_dir = LEFT;
 		_frame = 0;
 		break;
 	case WALKING_FORWARDS:
 		_state = WALKING_FORWARDS_LEFT;
-		_state_frame = 0;
+		_state_frame = 1;
 		_dir = LEFT;
 		break;
 	case WALKING_BACKWARDS:
 		_state = WALKING_BACKWARDS_LEFT;
-		_state_frame = 0;
+		_state_frame = 1;
 		_dir = LEFT;
 		break;
 	default:
@@ -263,18 +263,18 @@ character::walk_right()
 	switch(_state) {
 	case RESTING:
 		_state = WALKING_RIGHT;
-		_state_frame = 0;
+		_state_frame = 1;
 		_dir = RIGHT;
 		_frame = 0;
 		break;
 	case WALKING_FORWARDS:
 		_state = WALKING_FORWARDS_RIGHT;
-		_state_frame = 0;
+		_state_frame = 1;
 		_dir = RIGHT;
 		break;
 	case WALKING_BACKWARDS:
 		_state = WALKING_BACKWARDS_RIGHT;
-		_state_frame = 0;
+		_state_frame = 1;
 		_dir = RIGHT;
 		break;
 	default:
