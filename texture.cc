@@ -84,6 +84,7 @@ texture::load_png(texture* texture, const char* filename)
 		throw std::runtime_error("Unsupported texture bit depth");
 	}
 
+#if 0
 	if((info_ptr->width & (info_ptr->width - 1)) || !info_ptr) {
 		png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
 		fclose(fp);
@@ -95,6 +96,7 @@ texture::load_png(texture* texture, const char* filename)
 		fclose(fp);
 		throw std::runtime_error("Unsupported texture height");
 	}
+#endif
 
 	texture->_width = info_ptr->width;
 	texture->_height = info_ptr->height;

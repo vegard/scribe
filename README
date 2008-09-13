@@ -1,8 +1,15 @@
 Tiles were taken from:
 http://www.purezc.com/index.php?page=tiles&id=457
 
-Sprites were taken from:
+Original sprites were taken from:
 http://legend-of-zelda411.tripod.com/sprites_gifs.html
+
+...but since these are copyrighted, they have as of September 13, 2008 been
+replaced with the "Scribe" sprites, found here:
+http://www.bubbleleague.com/visuals/
+
+These are also copyrighted, but we have permission to use and distribute
+them by the Creative Commons license.
 
 Requires the OpenGL, GLU, GLUT, and PNG libraries.
 To compile, run `make'. To play, run `./link'.

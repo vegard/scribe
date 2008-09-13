@@ -62,19 +62,16 @@ private:
 	bool _jumping;
 
 	enum {
-		FORWARDS_A,
-		FORWARDS_B,
-		BACKWARDS_A,
-		BACKWARDS_B,
-		LEFT_A,
-		LEFT_B,
-		RIGHT_A,
-		RIGHT_B,
+		FORWARDS,
+		BACKWARDS,
+		LEFT,
+		RIGHT,
 	} _dir;
 
+	unsigned int _state_frame;
 	unsigned int _frame;
 
-	const texture* textures[8];
+	const texture* textures[28];
 	const texture* shadow_texture;
 
 	bool _tracking;
