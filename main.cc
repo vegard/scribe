@@ -375,7 +375,7 @@ main(int argc, char *argv[])
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_FRONT);
 
-	glClearColor(0.54, 0.44, 0.28, 0.0);
+	glClearColor(0.40, 0.55, 0.0, 0.0);
 	static const GLfloat fog_color[4] = {0.54, 0.44, 0.28, 0};
 	glFogi(GL_FOG_MODE, GL_LINEAR);
 	glFogf(GL_FOG_DENSITY, 1);
