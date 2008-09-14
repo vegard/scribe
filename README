@@ -12,6 +12,6 @@ These are also copyrighted, but we have permission to use and distribute
 them by the Creative Commons license.
 
 Requires the OpenGL, GLU, GLUT, and PNG libraries.
-To compile, run `make'. To play, run `./link'.
+To compile, run `make'. To play, run `./scribe'.
 
 Press F12 to save a screenshot to the png directory.
