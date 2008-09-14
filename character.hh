@@ -7,6 +7,7 @@ extern "C" {
 #include "GL/gl.h"
 }
 
+class animation;
 class texture;
 
 class character:
@@ -44,6 +45,13 @@ public:
 	void set_tracking(bool tracking);
 
 private:
+	animation* _forwards;
+	animation* _backwards;
+	animation* _left;
+	animation* _right;
+
+	const texture* _shadow_texture;
+
 	vector _position;
 	vector _velocity;
 
@@ -68,11 +76,10 @@ private:
 		RIGHT,
 	} _dir;
 
-	unsigned int _state_frame;
 	unsigned int _frame;
 
-	const texture* textures[32];
-	const texture* shadow_texture;
+	animation* _front;
+	animation* _back;
 
 	bool _tracking;
 };
