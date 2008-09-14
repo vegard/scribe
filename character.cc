@@ -151,8 +151,8 @@ character::update(unsigned int delta)
 		return;
 
 	_frame += delta;
-	if(_frame > 256) {
-		_frame %= 256;
+	if(_frame > 128) {
+		_frame %= 128;
 		if(++_state_frame == 7)
 			_state_frame = 0;
 	}
