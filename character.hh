@@ -71,7 +71,7 @@ private:
 	unsigned int _state_frame;
 	unsigned int _frame;
 
-	const texture* textures[28];
+	const texture* textures[32];
 	const texture* shadow_texture;
 
 	bool _tracking;
