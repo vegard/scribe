@@ -136,7 +136,7 @@ void
 character::update(unsigned int delta)
 {
 	if(_jumping)
-		_velocity += vector(0, -0.0003, 0);
+		_velocity += vector(0, -3e-5, 0) * delta;
 
 	const vector& v = get_velocity() + _velocity;
 
