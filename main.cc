@@ -344,7 +344,7 @@ main(int argc, char *argv[])
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
 	glutInitWindowSize(640, 480);
 
-	int window = glutCreateWindow("Link");
+	int window = glutCreateWindow("Scribe");
 
 	glutIgnoreKeyRepeat(1);
 
