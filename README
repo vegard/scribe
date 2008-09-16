@@ -15,3 +15,10 @@ Requires the OpenGL, GLU, GLUT, and PNG libraries.
 To compile, run `make'. To play, run `./scribe'.
 
 Press F12 to save a screenshot to the png directory.
+
+If you want to make a "screencast" (a movie), you can add -DCONFIG_CAPTURE to
+CFLAGS and recompile the program. This will save 1 new PNG file for each
+frame that is displayed on the screen. These can later be combined into for
+example an Ogg Theora movie using this command:
+
+    $ png2theora -o screencast.ogv png/%04d.png

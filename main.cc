@@ -169,10 +169,16 @@ display()
 
 	glutSwapBuffers();
 
-	if(0)
-		capture();
-
+#ifdef CONFIG_CAPTURE
+	/* If we're capturing, we want a constant frame rate for the
+	 * captured data, not necessarily for what's displayed on the
+	 * screen. */
+	scene.update(25);
+	capture();
+#else
 	scene.update(time - time_prev);
+#endif
+
 	time_prev = time;
 }
 
