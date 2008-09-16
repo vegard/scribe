@@ -1,0 +1,13 @@
+I don't use Windows myself, but it is possible to compile Scribe for Windows
+using Wine (winehq) to run the Dev-C++ compiler.
+
+You will need to download and install these Devpaks:
+
+glut: http://old.devpaks.org/show.php?devpak=128
+zlib: http://devpaks.org/details.php?devpak=27
+libpng: http://devpaks.org/details.php?devpak=28
+
+Be sure to create a Win32 GUI C++ project. You will have to add these linker
+flags (in this particular order) as well:
+
+-lglut32 -lglu32 -lopengl32 -lpng -lz -lwinmm
