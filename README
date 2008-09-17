@@ -11,7 +11,11 @@ http://www.bubbleleague.com/visuals/
 These are also copyrighted, but we have permission to use and distribute
 them by the Creative Commons license.
 
-Requires the OpenGL, GLU, GLUT, and PNG libraries.
+Requires the OpenGL, GLU, GLUT, and PNG libraries. On Ubuntu, you can install
+the dependencies by running the following command:
+
+  $ sudo apt-get install mesa-common-dev libglu1-mesa-dev freeglut-dev libpng-dev
+
 To compile, run `make'. To play, run `./scribe'.
 
 Press F12 to save a screenshot to the png directory.
