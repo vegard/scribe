@@ -1,7 +1,5 @@
-extern "C" {
-#include "gl.h"
-#include "glu.h"
-}
+#include "gl/gl.hh"
+#include "gl/glu.hh"
 
 #include "camera.hh"
 

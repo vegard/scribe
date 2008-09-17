@@ -1,9 +1,7 @@
+#include "gl/gl.hh"
+
 #include "background.hh"
 #include "texture.hh"
-
-extern "C" {
-#include "gl.h"
-}
 
 background::background()
 {

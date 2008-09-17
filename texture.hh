@@ -4,9 +4,7 @@
 #include <map>
 #include <string>
 
-extern "C" {
-#include "gl.h"
-}
+#include "gl/gl.hh"
 
 class texture;
 typedef std::map<std::string, texture*> texture_map;

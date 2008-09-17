@@ -1,11 +1,9 @@
 #ifndef CHARACTER_HH
 #define CHARACTER_HH
 
-#include "object.hh"
+#include "gl/gl.hh"
 
-extern "C" {
-#include "gl.h"
-}
+#include "object.hh"
 
 class animation;
 class texture;

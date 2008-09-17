@@ -1,13 +1,11 @@
 #include <cmath>
 
+#include "gl/gl.hh"
+#include "gl/glu.hh"
+
 #include "animation.hh"
 #include "character.hh"
 #include "texture.hh"
-
-extern "C" {
-#include "gl.h"
-#include "glu.h"
-}
 
 character::character():
 	_state(RESTING),

@@ -11,11 +11,9 @@ extern "C" {
 #include <png.h>
 }
 
-extern "C" {
-#include "gl.h"
-#include "glu.h"
-#include "glut.h"
-}
+#include "gl/gl.hh"
+#include "gl/glu.hh"
+#include "gl/glut.hh"
 
 #include "camera.hh"
 #include "character.hh"
