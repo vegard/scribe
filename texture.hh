@@ -5,7 +5,7 @@
 #include <string>
 
 extern "C" {
-#include <GL/gl.h>
+#include "gl.h"
 }
 
 class texture;

@@ -1,6 +1,6 @@
 extern "C" {
-#include <GL/gl.h>
-#include <GL/glu.h>
+#include "gl.h"
+#include "glu.h"
 }
 
 #include "camera.hh"

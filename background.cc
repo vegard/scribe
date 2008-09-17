@@ -2,7 +2,7 @@
 #include "texture.hh"
 
 extern "C" {
-#include "GL/gl.h"
+#include "gl.h"
 }
 
 background::background()

@@ -4,9 +4,9 @@ extern "C" {
 #include <errno.h>
 #include <stdint.h>
 
-#include <GL/gl.h>
-#include <GL/glext.h>
-#include <GL/glu.h>
+#include "gl.h"
+#include "glext.h"
+#include "glu.h"
 
 #include <png.h>
 }

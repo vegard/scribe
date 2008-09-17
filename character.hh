@@ -4,7 +4,7 @@
 #include "object.hh"
 
 extern "C" {
-#include "GL/gl.h"
+#include "gl.h"
 }
 
 class animation;
