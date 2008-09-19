@@ -174,7 +174,13 @@ display()
 	scene.update(25);
 	capture();
 #else
-	scene.update(time - time_prev);
+	/* Limit the frame rate */
+	int delta = time - time_prev;
+	if (delta < 10)
+		delta = 10;
+	if (delta > 100)
+		delta = 100;
+	scene.update(delta);
 #endif
 
 	time_prev = time;
