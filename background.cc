@@ -1,6 +1,7 @@
 #include "gl/gl.hh"
 
 #include "background.hh"
+#include "surface.hh"
 #include "texture.hh"
 
 background::background()
@@ -11,72 +12,62 @@ background::~background()
 {
 }
 
-static const texture* grass;
-static const texture* brick_wall_top;
-static const texture* brick_wall_bottom;
+static texture const* ground_textures[1];
+static unsigned char ground_map[] = {
+	0, 0, 0, 0,
+	0, 0, 0, 0,
+	0, 0, 0, 0,
+	0, 0, 0, 0,
+};
+static surface* ground;
+
+static texture const* wall_textures[2];
+static unsigned char wall_map[] = {
+	0, 0, 0, 0,
+	1, 1, 1, 1,
+};
+static surface* wall;
 
 void
 background::load_textures()
 {
-	grass = texture::get_png("tiles/grass.png");
-	brick_wall_top = texture::get_png("tiles/brick-wall-top.png");
-	brick_wall_bottom = texture::get_png("tiles/brick-wall-bottom.png");
+	ground_textures[0] = texture::get_png("tiles/grass.png");
+	ground = new surface(4, 4, ground_map, ground_textures);
+
+	wall_textures[0] = texture::get_png("tiles/brick-wall-top.png");
+	wall_textures[1] = texture::get_png("tiles/brick-wall-bottom.png");
+	wall = new surface(4, 2, wall_map, wall_textures);
 }
 
 void
 background::draw()
 {
-	glColor3f(1.0, 1.0, 1.0);
+	glPushMatrix();
+	glScalef(2, 2, 2);
+	glTranslatef(-2, 0, -2);
+	ground->draw();
+	glPopMatrix();
 
-	grass->bind();
-	glBegin(GL_QUADS);
-	for(int y = -2; y < 2; y++) {
-		for(int x = -2; x < 2; x++) {
-			glTexCoord2i(0, 0); glVertex3f(2 * x + 0, 0, 2 * y + 0);
-			glTexCoord2i(1, 0); glVertex3f(2 * x + 2, 0, 2 * y + 0);
-			glTexCoord2i(1, 1); glVertex3f(2 * x + 2, 0, 2 * y + 2);
-			glTexCoord2i(0, 1); glVertex3f(2 * x + 0, 0, 2 * y + 2);
-		}
-	}
-	glEnd();
+	glPushMatrix();
+	glScalef(2, 2, 2);
+	glTranslatef(-2, 2, -2);
+	glRotatef(90, 1, 0, 0);
+	wall->draw();
+	glPopMatrix();
 
-	brick_wall_bottom->bind();
-	glBegin(GL_QUADS);
-	for(int x = -2; x < 2; x++) {
-		glTexCoord2i(0, 0); glVertex3f(2 * x + 0, 2, -4);
-		glTexCoord2i(1, 0); glVertex3f(2 * x + 2, 2, -4);
-		glTexCoord2i(1, 1); glVertex3f(2 * x + 2, 0, -4);
-		glTexCoord2i(0, 1); glVertex3f(2 * x + 0, 0, -4);
+	glPushMatrix();
+	glScalef(2, 2, 2);
+	glTranslatef(2, 2, -2);
+	glRotatef(90, 1, 0, 0);
+	glRotatef(90, 0, 0, 1);
+	wall->draw();
+	glPopMatrix();
 
-		glTexCoord2i(0, 0); glVertex3f(-4, 2, 2 * x + 2);
-		glTexCoord2i(1, 0); glVertex3f(-4, 2, 2 * x + 0);
-		glTexCoord2i(1, 1); glVertex3f(-4, 0, 2 * x + 0);
-		glTexCoord2i(0, 1); glVertex3f(-4, 0, 2 * x + 2);
-
-		glTexCoord2i(0, 0); glVertex3f(4, 2, 2 * x + 0);
-		glTexCoord2i(1, 0); glVertex3f(4, 2, 2 * x + 2);
-		glTexCoord2i(1, 1); glVertex3f(4, 0, 2 * x + 2);
-		glTexCoord2i(0, 1); glVertex3f(4, 0, 2 * x + 0);
-	}
-	glEnd();
-
-	brick_wall_top->bind();
-	glBegin(GL_QUADS);
-	for(int x = -2; x < 2; x++) {
-		glTexCoord2i(0, 0); glVertex3f(2 * x + 0, 4, -4);
-		glTexCoord2i(1, 0); glVertex3f(2 * x + 2, 4, -4);
-		glTexCoord2i(1, 1); glVertex3f(2 * x + 2, 2, -4);
-		glTexCoord2i(0, 1); glVertex3f(2 * x + 0, 2, -4);
-
-		glTexCoord2i(0, 0); glVertex3f(-4, 4, 2 * x + 2);
-		glTexCoord2i(1, 0); glVertex3f(-4, 4, 2 * x + 0);
-		glTexCoord2i(1, 1); glVertex3f(-4, 2, 2 * x + 0);
-		glTexCoord2i(0, 1); glVertex3f(-4, 2, 2 * x + 2);
-
-		glTexCoord2i(0, 0); glVertex3f(4, 4, 2 * x + 0);
-		glTexCoord2i(1, 0); glVertex3f(4, 4, 2 * x + 2);
-		glTexCoord2i(1, 1); glVertex3f(4, 2, 2 * x + 2);
-		glTexCoord2i(0, 1); glVertex3f(4, 2, 2 * x + 0);
-	}
-	glEnd();
+	glPushMatrix();
+	glScalef(2, 2, 2);
+	glTranslatef(-2, 2, 2);
+	glRotatef(90, 1, 0, 0);
+	glRotatef(-90, 0, 0, 1);
+	wall->draw();
+	glPopMatrix();
 }
