@@ -1,6 +1,9 @@
 #include <cassert>
 
-#include "gl/gl.hh"
+extern "C" {
+#include <SDL.h>
+#include <SDL_opengl.h>
+}
 
 #include "surface.hh"
 #include "texture.hh"

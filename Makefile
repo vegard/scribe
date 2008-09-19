@@ -9,7 +9,7 @@ INCLUDES	+= -I/sw/include
 LIBS		+= -L/sw/lib
 FRAMEWORKS	+= -framework OpenGL -framework GLUT
 else
-LIBS		+= -lGL -lGLU -lglut
+LIBS		+= -lGL -lGLU
 endif
 
 all: scribe

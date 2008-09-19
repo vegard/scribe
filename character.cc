@@ -1,7 +1,9 @@
 #include <cmath>
 
-#include "gl/gl.hh"
-#include "gl/glu.hh"
+extern "C" {
+#include <SDL.h>
+#include <SDL_opengl.h>
+}
 
 #include "animation.hh"
 #include "character.hh"
