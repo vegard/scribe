@@ -1,3 +1,4 @@
+#include <cassert>
 #include <stdexcept>
 
 extern "C" {
@@ -17,7 +18,8 @@ extern "C" {
 
 texture_map texture::_textures;
 
-texture::texture()
+texture::texture():
+	_refcount(1)
 {
 	glGenTextures(1, &_id);
 
@@ -40,18 +42,30 @@ texture::bind() const
 	glBindTexture(GL_TEXTURE_2D, _id);
 }
 
-const texture*
+texture*
 texture::get_png(const std::string& filename)
 {
 	texture_map::iterator i = _textures.find(filename);
 
-	if(i != _textures.end())
-		return i->second;
+	if(i != _textures.end()) {
+		texture* t = i->second;
+		++t->_refcount;
+		return t;
+	}
 
 	texture* t = new texture();
 	load_png(t, filename.c_str());
 	_textures[filename] = t;
 	return t;
+}
+
+void
+texture::put(texture* t)
+{
+	assert(t->_refcount > 0);
+
+	if(--t->_refcount == 0)
+		delete t;
 }
 
 void

@@ -4,7 +4,7 @@
 #include "surface.hh"
 #include "texture.hh"
 
-static texture const* ground_textures[1];
+static texture* ground_textures[1];
 static unsigned char ground_map[] = {
 	0, 0, 0, 0,
 	0, 0, 0, 0,
@@ -13,7 +13,7 @@ static unsigned char ground_map[] = {
 };
 static surface* ground;
 
-static texture const* wall_textures[2];
+static texture* wall_textures[2];
 static unsigned char wall_map[] = {
 	0, 0, 0, 0,
 	1, 1, 1, 1,
@@ -32,6 +32,9 @@ background::background()
 
 background::~background()
 {
+	texture::put(ground_textures[0]);
+	texture::put(wall_textures[0]);
+	texture::put(wall_textures[1]);
 }
 
 void

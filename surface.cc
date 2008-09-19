@@ -6,7 +6,7 @@
 #include "texture.hh"
 
 surface::surface(unsigned int width, unsigned int height,
-	unsigned char *map, texture const** textures):
+	unsigned char *map, texture** textures):
 	_width(width),
 	_height(height),
 	_map(map),

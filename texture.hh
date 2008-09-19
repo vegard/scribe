@@ -21,12 +21,14 @@ public:
 	void bind() const;
 
 private:
+	unsigned int _refcount;
 	GLuint _id;
 	GLsizei _width;
 	GLsizei _height;
 
 public:
-	static const texture* get_png(const std::string& filename);
+	static texture* get_png(const std::string& filename);
+	static void put(texture* t);
 
 private:
 	static void load_png(texture* texture, const char* filename);

@@ -6,7 +6,7 @@ class texture;
 class surface {
 public:
 	surface(unsigned int width, unsigned int height,
-		unsigned char *map, texture const** textures);
+		unsigned char *map, texture** textures);
 	~surface();
 
 private:
@@ -20,7 +20,7 @@ private:
 	unsigned int _width;
 	unsigned int _height;
 	unsigned char *_map;
-	texture const** _textures;
+	texture** _textures;
 };
 
 #endif

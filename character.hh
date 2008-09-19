@@ -46,7 +46,7 @@ private:
 	animation* _left;
 	animation* _right;
 
-	const texture* _shadow_texture;
+	texture* _shadow_texture;
 
 	vector _position;
 	vector _velocity;

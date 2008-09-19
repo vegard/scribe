@@ -57,6 +57,10 @@ init()
 static void
 deinit()
 {
+	delete my_scene;
+	delete my_camera;
+	delete my_background;
+	delete my_character;
 }
 
 static void
@@ -220,6 +224,7 @@ keyboard(unsigned char key, int x, int y)
 {
 	switch(key) {
 	case 27:
+		deinit();
 		exit(0);
 	case ' ':
 		my_character->jump();
