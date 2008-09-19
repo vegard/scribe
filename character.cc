@@ -14,15 +14,6 @@ character::character():
 	_frame(0),
 	_tracking(false)
 {
-}
-
-character::~character()
-{
-}
-
-void
-character::load_textures()
-{
 	_forwards = new animation(8);
 	_forwards->set_frame(0, texture::get_png("sprites/scribe-down-1.png"));
 	_forwards->set_frame(1, texture::get_png("sprites/scribe-down-2.png"));
@@ -67,6 +58,10 @@ character::load_textures()
 
 	_front = _forwards;
 	_back = _backwards;
+}
+
+character::~character()
+{
 }
 
 void

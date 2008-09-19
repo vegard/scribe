@@ -4,14 +4,6 @@
 #include "surface.hh"
 #include "texture.hh"
 
-background::background()
-{
-}
-
-background::~background()
-{
-}
-
 static texture const* ground_textures[1];
 static unsigned char ground_map[] = {
 	0, 0, 0, 0,
@@ -28,8 +20,7 @@ static unsigned char wall_map[] = {
 };
 static surface* wall;
 
-void
-background::load_textures()
+background::background()
 {
 	ground_textures[0] = texture::get_png("tiles/grass.png");
 	ground = new surface(4, 4, ground_map, ground_textures);
@@ -37,6 +28,10 @@ background::load_textures()
 	wall_textures[0] = texture::get_png("tiles/brick-wall-top.png");
 	wall_textures[1] = texture::get_png("tiles/brick-wall-bottom.png");
 	wall = new surface(4, 2, wall_map, wall_textures);
+}
+
+background::~background()
+{
 }
 
 void

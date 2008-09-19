@@ -51,9 +51,6 @@ init()
 		get_camera_distance(), vector(0, 1, 0), 1e-5, 2e-3);
 	my_scene = new scene(*my_camera, *my_background);
 
-	my_character->load_textures();
-	my_background->load_textures();
-
 	my_scene->_objects.push_back(my_character);
 }
 

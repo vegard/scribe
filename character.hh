@@ -20,8 +20,6 @@ private:
 	character& operator=(const character&);
 
 public:
-	void load_textures();
-
 	void draw();
 	void update(unsigned int delta);
 

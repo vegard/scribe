@@ -11,8 +11,6 @@ private:
 	background& operator=(const background&);
 
 public:
-	void load_textures();
-
 	void draw();
 };
 
