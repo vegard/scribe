@@ -5,9 +5,10 @@ LIBS		= -lpng -lSDL
 FRAMEWORKS	=
 
 ifeq ($(SYS),Darwin)
-INCLUDES	+= -I/sw/include
+INCLUDES	+= -I/sw/include -I/sw/include/SDL
 LIBS		+= -L/sw/lib
-FRAMEWORKS	+= -framework OpenGL -framework GLUT
+LIBS		+= $(shell sdl-config --libs)
+FRAMEWORKS	+= -framework OpenGL
 else
 LIBS		+= -lGL -lGLU
 endif
