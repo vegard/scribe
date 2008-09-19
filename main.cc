@@ -35,21 +35,26 @@ static const vector& get_camera_distance()
 	return v;
 }
 
-static character protagonist;
-static background background;
+static character* my_character;
+static background* my_background;
 
-static spring_camera camera(protagonist,
-	get_camera_distance(), vector(0, 1, 0),
-	1e-5, 2e-3);
-static scene scene(camera, background);
+static spring_camera* my_camera;
+static scene* my_scene;
 
 static void
 init()
 {
-	protagonist.load_textures();
-	background.load_textures();
+	my_character = new character();
+	my_background = new background();
 
-	scene._objects.push_back(&protagonist);
+	my_camera = new spring_camera(*my_character,
+		get_camera_distance(), vector(0, 1, 0), 1e-5, 2e-3);
+	my_scene = new scene(*my_camera, *my_background);
+
+	my_character->load_textures();
+	my_background->load_textures();
+
+	my_scene->_objects.push_back(my_character);
 }
 
 static void
@@ -150,7 +155,7 @@ display()
 	frame++;
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	scene.draw();
+	my_scene->draw();
 
 	/* Display FPS counter */
 	glBindTexture(GL_TEXTURE_2D, 0);
@@ -171,7 +176,7 @@ display()
 	/* If we're capturing, we want a constant frame rate for the
 	 * captured data, not necessarily for what's displayed on the
 	 * screen. */
-	scene.update(25);
+	my_scene->update(25);
 	capture();
 #else
 	/* Limit the frame rate */
@@ -180,7 +185,7 @@ display()
 		delta = 10;
 	if (delta > 100)
 		delta = 100;
-	scene.update(delta);
+	my_scene->update(delta);
 #endif
 
 	time_prev = time;
@@ -220,21 +225,21 @@ keyboard(unsigned char key, int x, int y)
 	case 27:
 		exit(0);
 	case ' ':
-		protagonist.jump();
+		my_character->jump();
 		break;
 	case '-':
 		if(camera_zoom >= 16)
 			break;
 
 		camera_zoom++;
-		camera.set_distance(get_camera_distance());
+		my_camera->set_distance(get_camera_distance());
 		break;
 	case '+':
 		if(camera_zoom <= 4)
 			break;
 
 		camera_zoom--;
-		camera.set_distance(get_camera_distance());
+		my_camera->set_distance(get_camera_distance());
 		break;
 	default:
 		printf("key %d\n", key);
@@ -267,21 +272,21 @@ special(int key, int x, int y)
 
 	switch(key) {
 	case GLUT_KEY_DOWN:
-		protagonist.walk_forwards();
+		my_character->walk_forwards();
 		break;
 	case GLUT_KEY_UP:
-		protagonist.walk_backwards();
+		my_character->walk_backwards();
 		break;
 	case GLUT_KEY_LEFT:
-		protagonist.walk_left();
+		my_character->walk_left();
 		break;
 	case GLUT_KEY_RIGHT:
-		protagonist.walk_right();
+		my_character->walk_right();
 		break;
 	case GLUT_KEY_F1: {
 		static bool tracking = false;
 		tracking = !tracking;
-		protagonist.set_tracking(tracking);
+		my_character->set_tracking(tracking);
 		break;
 	}
 	case GLUT_KEY_F12:
@@ -311,16 +316,16 @@ specialUp(int key, int x, int y)
 
 	switch(key) {
 	case GLUT_KEY_DOWN:
-		protagonist.stop_forwards();
+		my_character->stop_forwards();
 		break;
 	case GLUT_KEY_UP:
-		protagonist.stop_backwards();
+		my_character->stop_backwards();
 		break;
 	case GLUT_KEY_LEFT:
-		protagonist.stop_left();
+		my_character->stop_left();
 		break;
 	case GLUT_KEY_RIGHT:
-		protagonist.stop_right();
+		my_character->stop_right();
 		break;
 	default:
 		printf("special up %d\n", key);
