@@ -1,7 +1,10 @@
 #ifndef CHARACTER_HH
 #define CHARACTER_HH
 
-#include "gl/gl.hh"
+extern "C" {
+#include <SDL.h>
+#include <SDL_opengl.h>
+}
 
 #include "object.hh"
 

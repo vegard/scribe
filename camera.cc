@@ -1,5 +1,7 @@
-#include "gl/gl.hh"
-#include "gl/glu.hh"
+extern "C" {
+#include <SDL.h>
+#include <SDL_opengl.h>
+}
 
 #include "camera.hh"
 

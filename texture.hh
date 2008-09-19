@@ -4,7 +4,10 @@
 #include <map>
 #include <string>
 
-#include "gl/gl.hh"
+extern "C" {
+#include <SDL.h>
+#include <SDL_opengl.h>
+}
 
 class texture;
 typedef std::map<std::string, texture*> texture_map;

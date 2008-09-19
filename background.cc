@@ -1,4 +1,7 @@
-#include "gl/gl.hh"
+extern "C" {
+#include <SDL.h>
+#include <SDL_opengl.h>
+}
 
 #include "background.hh"
 #include "surface.hh"
