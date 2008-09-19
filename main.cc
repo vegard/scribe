@@ -11,9 +11,10 @@ extern "C" {
 #include <png.h>
 }
 
-#include "gl/gl.hh"
-#include "gl/glu.hh"
-#include "gl/glut.hh"
+extern "C" {
+#include <SDL.h>
+#include <SDL_opengl.h>
+}
 
 #include "camera.hh"
 #include "character.hh"
@@ -112,33 +113,15 @@ capture()
 }
 
 static void
-string_stroke(void *font, const char *string)
-{
-	for(const char *c = string; *c; ++c)
-		glutStrokeCharacter(font, *c);
-}
-
-static unsigned int
-string_stroke_width(void *font, const char *string)
-{
-	int sum = 0;
-
-	for(const char *c = string; *c; ++c)
-		sum += glutStrokeWidth(font, *c);
-
-	return sum;
-}
-
-static void
 display()
 {
 	static unsigned int frame = 0;
-	static int time_prev = 0;
-	static int time_prev_fps = 0;
+	static Uint32 time_prev = 0;
+	static Uint32 time_prev_fps = 0;
 
 	static char fps[16] = "FPS: 0";
 
-	int time = glutGet(GLUT_ELAPSED_TIME);
+	Uint32 time = SDL_GetTicks();
 	if(time - time_prev_fps >= 250) {
 		snprintf(fps, sizeof(fps),
 			"FPS: %d", 1000 * frame / (time - time_prev_fps));
@@ -151,21 +134,7 @@ display()
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	scene.draw();
-
-	/* Display FPS counter */
-	glBindTexture(GL_TEXTURE_2D, 0);
-	glColor3f(1, 1, 1);
-
-	glPushMatrix();
-	glTranslatef(0, 2, -1);
-	glScalef(1e-2, 1e-2, 1e-2);
-	glTranslatef(
-		-0.5 * string_stroke_width(GLUT_STROKE_ROMAN, fps),
-		0, 0);
-	string_stroke(GLUT_STROKE_ROMAN, fps);
-	glPopMatrix();
-
-	glutSwapBuffers();
+	SDL_GL_SwapBuffers();
 
 #ifdef CONFIG_CAPTURE
 	/* If we're capturing, we want a constant frame rate for the
@@ -186,22 +155,17 @@ display()
 	time_prev = time;
 }
 
-static void
-idle()
+static Uint32
+displayTimer(Uint32 interval, void* param)
 {
-	static int time_prev = 0;
-
-	int time = glutGet(GLUT_ELAPSED_TIME);
-	if(100 * (time - time_prev) < 1000)
-		return;
-
-	time_prev = time;
-
-	glutPostRedisplay();
+	SDL_Event event;
+	event.type = SDL_USEREVENT;
+	SDL_PushEvent(&event);
+	return interval;
 }
 
 static void
-reshape(int width, int height)
+resize(int width, int height)
 {
 	if(width == 0 || height == 0)
 		return;
@@ -214,11 +178,21 @@ reshape(int width, int height)
 }
 
 static void
-keyboard(unsigned char key, int x, int y)
+keyboard(SDL_KeyboardEvent* key)
 {
-	switch(key) {
-	case 27:
-		exit(0);
+	switch(key->keysym.sym) {
+	case SDLK_DOWN:
+		protagonist.walk_forwards();
+		break;
+	case SDLK_UP:
+		protagonist.walk_backwards();
+		break;
+	case SDLK_LEFT:
+		protagonist.walk_left();
+		break;
+	case SDLK_RIGHT:
+		protagonist.walk_right();
+		break;
 	case ' ':
 		protagonist.jump();
 		break;
@@ -236,139 +210,67 @@ keyboard(unsigned char key, int x, int y)
 		camera_zoom--;
 		camera.set_distance(get_camera_distance());
 		break;
-	default:
-		printf("key %d\n", key);
-	}
-}
-
-static void
-keyboardUp(unsigned char key, int x, int y)
-{
-}
-
-static bool special_pressed[256] = {};
-
-static void
-special(int key, int x, int y)
-{
-	if(key < 0 || key > 255) {
-		std::cerr << "warning: Unhandled special key "
-			<< key << std::endl;
-		return;
-	}
-
-	if(special_pressed[key]) {
-		std::cerr << "warning: Received double key-press for special "
-			"key " << key << std::endl;
-		return;
-	}
-
-	special_pressed[key] = true;
-
-	switch(key) {
-	case GLUT_KEY_DOWN:
-		protagonist.walk_forwards();
+	case SDLK_ESCAPE: {
+			SDL_Event event;
+			event.type = SDL_QUIT;
+			SDL_PushEvent(&event);
+		}
 		break;
-	case GLUT_KEY_UP:
-		protagonist.walk_backwards();
+	case SDLK_F1: {
+			static bool tracking = false;
+			tracking = !tracking;
+			protagonist.set_tracking(tracking);
+		}
 		break;
-	case GLUT_KEY_LEFT:
-		protagonist.walk_left();
-		break;
-	case GLUT_KEY_RIGHT:
-		protagonist.walk_right();
-		break;
-	case GLUT_KEY_F1: {
-		static bool tracking = false;
-		tracking = !tracking;
-		protagonist.set_tracking(tracking);
-		break;
-	}
-	case GLUT_KEY_F12:
+	case SDLK_F12:
 		capture();
 		break;
 	default:
-		printf("special %d\n", key);
+		printf("key %d\n", key->keysym.sym);
 	}
 }
 
 static void
-specialUp(int key, int x, int y)
+keyboardUp(SDL_KeyboardEvent* key)
 {
-	if(key < 0 || key > 255) {
-		std::cerr << "warning: Unhandled special key "
-			<< key << std::endl;
-		return;
-	}
-
-	if(!special_pressed[key]) {
-		std::cerr << "warning: Received phantom key-release for "
-			"special key " << key << std::endl;
-		return;
-	}
-
-	special_pressed[key] = false;
-
-	switch(key) {
-	case GLUT_KEY_DOWN:
+	switch(key->keysym.sym) {
+	case SDLK_DOWN:
 		protagonist.stop_forwards();
 		break;
-	case GLUT_KEY_UP:
+	case SDLK_UP:
 		protagonist.stop_backwards();
 		break;
-	case GLUT_KEY_LEFT:
+	case SDLK_LEFT:
 		protagonist.stop_left();
 		break;
-	case GLUT_KEY_RIGHT:
+	case SDLK_RIGHT:
 		protagonist.stop_right();
 		break;
 	default:
-		printf("special up %d\n", key);
+		break;
 	}
-}
-
-static void
-mouse(int button, int state, int x, int y)
-{
-}
-
-static void
-motion(int x, int y)
-{
-}
-
-static void
-passiveMotion(int x, int y)
-{
-}
-
-static void
-entry(int state)
-{
 }
 
 int
 main(int argc, char *argv[])
 {
-	glutInit(&argc, argv);
-	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
-	glutInitWindowSize(640, 480);
+	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) == -1) {
+		fprintf(stderr, "error: %s\n", SDL_GetError());
+		exit(1);
+	}
 
-	int window = glutCreateWindow("Scribe");
+	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 16);
+	SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
+	SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
+	SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
+	SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 8);
 
-	glutIgnoreKeyRepeat(1);
-
-	glutDisplayFunc(&display);
-	glutIdleFunc(&idle);
-	glutReshapeFunc(&reshape);
-	glutKeyboardFunc(&keyboard);
-	glutKeyboardUpFunc(&keyboardUp);
-	glutSpecialFunc(&special);
-	glutSpecialUpFunc(&specialUp);
-	glutMouseFunc(&mouse);
-	glutMotionFunc(&motion);
-	glutPassiveMotionFunc(&passiveMotion);
-	glutEntryFunc(&entry);
+	SDL_Surface* surface = SDL_SetVideoMode(640, 480, 0, SDL_OPENGL);
+	if (!surface) {
+		fprintf(stderr, "error: %s\n", SDL_GetError());
+		exit(1);
+	}
 
 	init();
 
@@ -396,10 +298,44 @@ main(int argc, char *argv[])
 
 	glShadeModel(GL_SMOOTH);
 
-	glutMainLoop();
+	resize(640, 480);
 
-	glutDestroyWindow(window);
+	/* 25 FPS */
+	SDL_TimerID display_timer = SDL_AddTimer(1000 / 100,
+		&displayTimer, NULL);
+	if (!display_timer) {
+		fprintf(stderr, "error: %s\n", SDL_GetError());
+		exit(1);
+	}
+
+	bool running = true;
+	SDL_Event event;
+	while (running) {
+		SDL_WaitEvent(&event);
+
+		switch (event.type) {
+		case SDL_USEREVENT:
+			display();
+			break;
+		case SDL_KEYDOWN:
+			keyboard(&event.key);
+			break;
+		case SDL_KEYUP:
+			keyboardUp(&event.key);
+			break;
+		case SDL_MOUSEBUTTONDOWN:
+			break;
+		case SDL_QUIT:
+			running = false;
+			break;
+		case SDL_VIDEORESIZE:
+			resize(event.resize.w, event.resize.h);
+			break;
+		}
+	}
 
 	deinit();
+
+	SDL_Quit();
 	return 0;
 }

@@ -1,7 +1,7 @@
 SYS		:= $(shell uname -s)
 
-INCLUDES	= -I.
-LIBS		= -lpng
+INCLUDES	= -I. -I/usr/include/SDL
+LIBS		= -lpng -lSDL
 FRAMEWORKS	=
 
 ifeq ($(SYS),Darwin)
