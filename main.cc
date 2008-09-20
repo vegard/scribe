@@ -125,12 +125,9 @@ display()
 	static Uint32 time_prev = 0;
 	static Uint32 time_prev_fps = 0;
 
-	static char fps[16] = "FPS: 0";
-
 	Uint32 time = SDL_GetTicks();
-	if(time - time_prev_fps >= 250) {
-		snprintf(fps, sizeof(fps),
-			"FPS: %d", 1000 * frame / (time - time_prev_fps));
+	if(time - time_prev_fps >= 5000) {
+		printf("FPS: %d\n", 1000 * frame / (time - time_prev_fps));
 
 		frame = 0;
 		time_prev_fps = time;
